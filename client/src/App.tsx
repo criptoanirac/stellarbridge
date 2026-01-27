@@ -4,13 +4,21 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import Onboarding from "./pages/Onboarding";
+import EmployerDashboard from "./pages/EmployerDashboard";
+import TalentBank from "./pages/TalentBank";
+import Matchmaking from "./pages/Matchmaking";
+import TalentProfile from "./pages/TalentProfile";
 
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Onboarding} />
+      <Route path={"/employer-dashboard"} component={EmployerDashboard} />
+      <Route path={"/talent-bank"} component={TalentBank} />
+      <Route path={"/matchmaking/:talentId"} component={Matchmaking} />
+      <Route path={"/talent-profile/:talentId"} component={TalentProfile} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -27,8 +35,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider
-        defaultTheme="light"
-        // switchable
+        defaultTheme="dark"
       >
         <TooltipProvider>
           <Toaster />
