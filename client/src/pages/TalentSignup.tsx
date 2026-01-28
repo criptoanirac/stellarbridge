@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Upload, Plus, X } from "lucide-react";
+import { ArrowLeft, Upload, Plus, X, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 export default function TalentSignup() {
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     // Personal Info
     firstName: "",
@@ -49,6 +50,14 @@ export default function TalentSignup() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const addSkill = () => {
@@ -58,6 +67,14 @@ export default function TalentSignup() {
         skills: [...prev.skills, prev.newSkill.trim()],
         newSkill: "",
       }));
+      // Clear skills error when adding a skill
+      if (errors.skills) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.skills;
+          return newErrors;
+        });
+      }
     }
   };
 
@@ -72,9 +89,17 @@ export default function TalentSignup() {
     if (formData.newEducation.school && formData.newEducation.degree) {
       setFormData((prev) => ({
         ...prev,
-        education: [...prev.education, formData.newEducation],
+        education: [...prev.education, prev.newEducation],
         newEducation: { school: "", degree: "", year: "" },
       }));
+      // Clear education error when adding education
+      if (errors.education) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.education;
+          return newErrors;
+        });
+      }
     }
   };
 
@@ -89,9 +114,17 @@ export default function TalentSignup() {
     if (formData.newCertification.trim()) {
       setFormData((prev) => ({
         ...prev,
-        certifications: [...prev.certifications, formData.newCertification.trim()],
+        certifications: [...prev.certifications, prev.newCertification.trim()],
         newCertification: "",
       }));
+      // Clear certifications error when adding certification
+      if (errors.certifications) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.certifications;
+          return newErrors;
+        });
+      }
     }
   };
 
@@ -102,13 +135,118 @@ export default function TalentSignup() {
     }));
   };
 
+  // Auto-fill with fictional data
+  const autoFillData = () => {
+    const sampleData = {
+      firstName: "Ana",
+      lastName: "Silva",
+      email: "ana.silva@email.com",
+      phone: "(11) 98765-4321",
+      location: "São Paulo, SP",
+      bio: "Desenvolvedora Full Stack apaixonada por criar soluções inovadoras que impactam positivamente a vida das pessoas.",
+      currentRole: "Desenvolvedora Full Stack",
+      yearsExperience: "3-5",
+      industry: "Tecnologia",
+      skills: ["React", "Node.js", "TypeScript", "PostgreSQL"],
+      education: [
+        {
+          school: "Universidade de São Paulo",
+          degree: "Bacharelado em Ciência da Computação",
+          year: "2020",
+        },
+      ],
+      certifications: ["AWS Certified Solutions Architect"],
+      portfolioUrl: "https://anasilva.dev",
+      githubUrl: "https://github.com/anasilva",
+      linkedinUrl: "https://linkedin.com/in/anasilva",
+      newSkill: "",
+      newEducation: { school: "", degree: "", year: "" },
+      newCertification: "",
+    };
+    setFormData(sampleData);
+    setErrors({});
+    toast.success("✨ Dados fictícios preenchidos automaticamente!");
+  };
+
   const { user } = useAuth();
   const createProfileMutation = trpc.talent.createProfile.useMutation();
   const addSkillMutation = trpc.talent.addSkill.useMutation();
   const addEducationMutation = trpc.talent.addEducation.useMutation();
   const addCertificationMutation = trpc.talent.addCertification.useMutation();
 
+  const validateStep1 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "Nome é obrigatório";
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Sobrenome é obrigatório";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email é obrigatório";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email inválido";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Telefone é obrigatório";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.currentRole.trim()) {
+      newErrors.currentRole = "Cargo atual é obrigatório";
+    }
+    if (!formData.yearsExperience) {
+      newErrors.yearsExperience = "Anos de experiência é obrigatório";
+    }
+    if (formData.skills.length === 0) {
+      newErrors.skills = "Adicione pelo menos uma habilidade";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (formData.education.length === 0 && formData.certifications.length === 0) {
+      newErrors.education = "Adicione pelo menos uma formação ou certificação";
+      newErrors.certifications = "Adicione pelo menos uma formação ou certificação";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (currentStep === 1 && !validateStep1()) {
+      toast.error("Por favor, preencha todos os campos obrigatórios");
+      return;
+    }
+    if (currentStep === 2 && !validateStep2()) {
+      toast.error("Por favor, preencha todos os campos obrigatórios");
+      return;
+    }
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep((prev) => prev - 1);
+  };
+
   const handleSubmit = async () => {
+    if (!validateStep3()) {
+      toast.error("Por favor, adicione pelo menos uma formação ou certificação");
+      return;
+    }
+
     if (!user) {
       toast.error("Você precisa estar autenticado para criar um perfil");
       return;
@@ -167,10 +305,6 @@ export default function TalentSignup() {
     }
   };
 
-  const isStep1Valid = formData.firstName && formData.lastName && formData.email && formData.phone;
-  const isStep2Valid = formData.currentRole && formData.yearsExperience && formData.skills.length > 0;
-  const isStep3Valid = formData.education.length > 0 || formData.certifications.length > 0;
-
   return (
     <div className="min-h-screen grid-bg relative overflow-hidden">
       {/* Animated background */}
@@ -183,215 +317,271 @@ export default function TalentSignup() {
       {/* Content */}
       <div className="relative z-10 container mx-auto py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => setLocation("/")}
-            className="p-2 hover:bg-cyan-500/10 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-cyan-400" />
-          </button>
-          <div>
-            <h1 className="text-4xl font-bold font-mono gradient-cyber-text">
-              Cadastro de Talento
-            </h1>
-            <p className="text-gray-400 mt-1">Junte-se à rede Stellar e encontre oportunidades</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setLocation("/")}
+              className="p-2 hover:bg-cyan-500/10 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6 text-cyan-400" />
+            </button>
+            <div>
+              <h1 className="text-4xl font-bold font-mono gradient-cyber-text">
+                Cadastro de Talento
+              </h1>
+              <p className="text-gray-400 mt-1">Junte-se à rede Stellar e encontre oportunidades</p>
+            </div>
           </div>
+          
+          {/* Auto-fill button */}
+          <Button
+            onClick={autoFillData}
+            variant="outline"
+            className="gap-2 border-cyan-500/30 hover:border-cyan-500/50 hover:bg-cyan-500/10"
+          >
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            Preencher com Dados Fictícios
+          </Button>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8 flex gap-4">
-          {[1, 2, 3].map((step) => (
-            <div key={step} className="flex-1">
-              <div
-                className={`h-2 rounded-full transition-all ${
-                  step <= currentStep
-                    ? "bg-gradient-to-r from-cyan-500 to-magenta-500"
-                    : "bg-gray-700"
-                }`}
-              />
-              <p className={`text-xs mt-2 ${step <= currentStep ? "text-cyan-400" : "text-gray-500"}`}>
-                {step === 1 ? "Dados Pessoais" : step === 2 ? "Profissional" : "Educação"}
-              </p>
-            </div>
-          ))}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex items-center flex-1">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                    currentStep >= step
+                      ? "bg-gradient-to-r from-cyan-500 to-magenta-500 text-white"
+                      : "bg-gray-700 text-gray-400"
+                  }`}
+                >
+                  {step}
+                </div>
+                {step < 3 && (
+                  <div
+                    className={`flex-1 h-1 mx-2 transition-all ${
+                      currentStep > step ? "bg-gradient-to-r from-cyan-500 to-magenta-500" : "bg-gray-700"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between text-sm text-gray-400">
+            <span>Dados Pessoais</span>
+            <span>Informações Profissionais</span>
+            <span>Educação & Certificações</span>
+          </div>
         </div>
 
-        {/* Form Container */}
-        <div className="max-w-2xl mx-auto">
+        {/* Form Card */}
+        <div className="card-cyber p-8 max-w-3xl mx-auto">
           {/* Step 1: Personal Info */}
           {currentStep === 1 && (
-            <div className="card-neon space-y-6">
-              <h2 className="text-2xl font-bold text-cyan-400 mb-6">Informações Pessoais</h2>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6">Dados Pessoais</h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">Nome *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nome <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    placeholder="Seu nome"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                    className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                      errors.firstName ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                    placeholder="Ex: Maria"
                   />
+                  {errors.firstName && (
+                    <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">Sobrenome *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Sobrenome <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    placeholder="Seu sobrenome"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                    className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                      errors.lastName ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                    placeholder="Ex: Silva"
                   />
+                  {errors.lastName && (
+                    <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Email *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Email <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="seu@email.com"
-                  className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                  className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                    errors.email ? "border-red-500" : "border-gray-700"
+                  } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                  placeholder="seu.email@exemplo.com"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Telefone *</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Localização</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    placeholder="São Paulo, SP"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Bio Profissional</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Telefone <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                    errors.phone ? "border-red-500" : "border-gray-700"
+                  } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                  placeholder="(11) 98765-4321"
+                />
+                {errors.phone && (
+                  <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Localização</label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                  placeholder="São Paulo, SP"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Bio Profissional</label>
                 <textarea
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
-                  placeholder="Conte um pouco sobre você..."
                   rows={4}
-                  className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400 resize-none"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white resize-none"
+                  placeholder="Conte um pouco sobre você e sua trajetória profissional..."
                 />
-              </div>
-
-              <div className="flex gap-4 pt-6">
-                <button
-                  onClick={() => setLocation("/")}
-                  className="btn-cyber-outline flex-1"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => setCurrentStep(2)}
-                  disabled={!isStep1Valid}
-                  className="btn-cyber flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Próximo
-                </button>
               </div>
             </div>
           )}
 
           {/* Step 2: Professional Info */}
           {currentStep === 2 && (
-            <div className="card-neon space-y-6">
+            <div className="space-y-6">
               <h2 className="text-2xl font-bold text-cyan-400 mb-6">Informações Profissionais</h2>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Cargo Atual *</label>
-                  <input
-                    type="text"
-                    name="currentRole"
-                    value={formData.currentRole}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Desenvolvedora Full Stack"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Anos de Experiência *</label>
-                  <select
-                    name="yearsExperience"
-                    value={formData.yearsExperience}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 focus:outline-none focus:border-cyan-400"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="0-1">0-1 ano</option>
-                    <option value="1-3">1-3 anos</option>
-                    <option value="3-5">3-5 anos</option>
-                    <option value="5-10">5-10 anos</option>
-                    <option value="10+">10+ anos</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Cargo Atual <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="currentRole"
+                  value={formData.currentRole}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                    errors.currentRole ? "border-red-500" : "border-gray-700"
+                  } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                  placeholder="Ex: Desenvolvedora Full Stack"
+                />
+                {errors.currentRole && (
+                  <p className="text-red-500 text-sm mt-1">{errors.currentRole}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Indústria</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Anos de Experiência <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="yearsExperience"
+                  value={formData.yearsExperience}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                    errors.yearsExperience ? "border-red-500" : "border-gray-700"
+                  } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                >
+                  <option value="">Selecione...</option>
+                  <option value="0-1">0-1 anos</option>
+                  <option value="1-3">1-3 anos</option>
+                  <option value="3-5">3-5 anos</option>
+                  <option value="5-10">5-10 anos</option>
+                  <option value="10+">10+ anos</option>
+                </select>
+                {errors.yearsExperience && (
+                  <p className="text-red-500 text-sm mt-1">{errors.yearsExperience}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Indústria</label>
                 <input
                   type="text"
                   name="industry"
                   value={formData.industry}
                   onChange={handleInputChange}
-                  placeholder="Ex: Tecnologia, Fintech, E-commerce"
-                  className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                  placeholder="Ex: Tecnologia"
                 />
               </div>
 
-              {/* Skills */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Habilidades *</label>
-                <div className="flex gap-2 mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Habilidades <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
+                    name="newSkill"
                     value={formData.newSkill}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, newSkill: e.target.value }))}
-                    onKeyPress={(e) => e.key === "Enter" && addSkill()}
-                    placeholder="Digite uma habilidade"
-                    className="flex-1 px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                    onChange={handleInputChange}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
+                    className={`flex-1 px-4 py-3 bg-gray-800/50 border ${
+                      errors.skills ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                    placeholder="Ex: React, Node.js, Python..."
                   />
-                  <button
+                  <Button
                     onClick={addSkill}
-                    className="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
+                    className="bg-cyan-500 hover:bg-cyan-600 text-white"
                   >
                     <Plus className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
-
+                {errors.skills && (
+                  <p className="text-red-500 text-sm mb-2">{errors.skills}</p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {formData.skills.map((skill, index) => (
                     <div
                       key={index}
-                      className="badge-stellar flex items-center gap-2 px-3 py-1"
+                      className="flex items-center gap-2 px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400"
                     >
-                      {skill}
+                      <span>{skill}</span>
                       <button
                         onClick={() => removeSkill(index)}
-                        className="hover:text-red-400 transition-colors"
+                        className="hover:text-cyan-300"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -399,34 +589,19 @@ export default function TalentSignup() {
                   ))}
                 </div>
               </div>
-
-              <div className="flex gap-4 pt-6">
-                <button
-                  onClick={() => setCurrentStep(1)}
-                  className="btn-cyber-outline flex-1"
-                >
-                  Voltar
-                </button>
-                <button
-                  onClick={() => setCurrentStep(3)}
-                  disabled={!isStep2Valid}
-                  className="btn-cyber flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Próximo
-                </button>
-              </div>
             </div>
           )}
 
-          {/* Step 3: Education & Portfolio */}
+          {/* Step 3: Education & Certifications */}
           {currentStep === 3 && (
-            <div className="card-neon space-y-6">
+            <div className="space-y-6">
               <h2 className="text-2xl font-bold text-cyan-400 mb-6">Educação & Certificações</h2>
 
-              {/* Education */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Educação</label>
-                <div className="space-y-3 mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Educação <span className="text-red-500">*</span>
+                </label>
+                <div className="space-y-3 mb-3">
                   <input
                     type="text"
                     value={formData.newEducation.school}
@@ -436,8 +611,10 @@ export default function TalentSignup() {
                         newEducation: { ...prev.newEducation, school: e.target.value },
                       }))
                     }
+                    className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                      errors.education ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
                     placeholder="Instituição"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
                   />
                   <input
                     type="text"
@@ -448,43 +625,52 @@ export default function TalentSignup() {
                         newEducation: { ...prev.newEducation, degree: e.target.value },
                       }))
                     }
-                    placeholder="Curso/Diploma"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                    className={`w-full px-4 py-3 bg-gray-800/50 border ${
+                      errors.education ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                    placeholder="Curso"
                   />
-                  <input
-                    type="text"
-                    value={formData.newEducation.year}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        newEducation: { ...prev.newEducation, year: e.target.value },
-                      }))
-                    }
-                    placeholder="Ano de conclusão"
-                    className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                  />
-                  <button
-                    onClick={addEducation}
-                    className="w-full px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
-                  >
-                    + Adicionar Educação
-                  </button>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={formData.newEducation.year}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          newEducation: { ...prev.newEducation, year: e.target.value },
+                        }))
+                      }
+                      className={`flex-1 px-4 py-3 bg-gray-800/50 border ${
+                        errors.education ? "border-red-500" : "border-gray-700"
+                      } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
+                      placeholder="Ano de conclusão"
+                    />
+                    <Button
+                      onClick={addEducation}
+                      className="bg-cyan-500 hover:bg-cyan-600 text-white"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </Button>
+                  </div>
                 </div>
-
+                {errors.education && (
+                  <p className="text-red-500 text-sm mb-2">{errors.education}</p>
+                )}
                 <div className="space-y-2">
                   {formData.education.map((edu, index) => (
                     <div
                       key={index}
-                      className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-start justify-between"
+                      className="flex items-center justify-between p-3 bg-gray-800/50 border border-gray-700 rounded-lg"
                     >
                       <div>
-                        <p className="text-cyan-400 font-semibold">{edu.degree}</p>
-                        <p className="text-sm text-gray-400">{edu.school}</p>
-                        <p className="text-xs text-gray-500">{edu.year}</p>
+                        <p className="text-white font-medium">{edu.degree}</p>
+                        <p className="text-gray-400 text-sm">
+                          {edu.school} {edu.year && `• ${edu.year}`}
+                        </p>
                       </div>
                       <button
                         onClick={() => removeEducation(index)}
-                        className="text-gray-400 hover:text-red-400 transition-colors"
+                        className="text-red-400 hover:text-red-300"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -493,114 +679,123 @@ export default function TalentSignup() {
                 </div>
               </div>
 
-              {/* Certifications */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Certificações</label>
-                <div className="flex gap-2 mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Certificações <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
+                    name="newCertification"
                     value={formData.newCertification}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, newCertification: e.target.value }))}
-                    onKeyPress={(e) => e.key === "Enter" && addCertification()}
+                    onChange={handleInputChange}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addCertification())}
+                    className={`flex-1 px-4 py-3 bg-gray-800/50 border ${
+                      errors.certifications ? "border-red-500" : "border-gray-700"
+                    } rounded-lg focus:outline-none focus:border-cyan-500 text-white`}
                     placeholder="Ex: AWS Certified Solutions Architect"
-                    className="flex-1 px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
                   />
-                  <button
+                  <Button
                     onClick={addCertification}
-                    className="px-4 py-2 bg-magenta-500/20 text-magenta-400 rounded-lg hover:bg-magenta-500/30 transition-colors"
+                    className="bg-cyan-500 hover:bg-cyan-600 text-white"
                   >
                     <Plus className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
-
-                <div className="flex flex-wrap gap-2">
+                {errors.certifications && (
+                  <p className="text-red-500 text-sm mb-2">{errors.certifications}</p>
+                )}
+                <div className="space-y-2">
                   {formData.certifications.map((cert, index) => (
                     <div
                       key={index}
-                      className="badge-stellar bg-magenta-500/20 text-magenta-400 flex items-center gap-2 px-3 py-1"
+                      className="flex items-center justify-between p-3 bg-gray-800/50 border border-gray-700 rounded-lg"
                     >
-                      {cert}
+                      <p className="text-white">{cert}</p>
                       <button
                         onClick={() => removeCertification(index)}
-                        className="hover:text-red-400 transition-colors"
+                        className="text-red-400 hover:text-red-300"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-5 h-5" />
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Portfolio Links */}
-              <div className="border-t border-cyan-500/20 pt-6">
-                <h3 className="text-lg font-semibold text-cyan-400 mb-4">Links Profissionais</h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-2">Portfolio/Website</label>
-                    <input
-                      type="url"
-                      name="portfolioUrl"
-                      value={formData.portfolioUrl}
-                      onChange={handleInputChange}
-                      placeholder="https://seu-portfolio.com"
-                      className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-2">GitHub</label>
-                    <input
-                      type="url"
-                      name="githubUrl"
-                      value={formData.githubUrl}
-                      onChange={handleInputChange}
-                      placeholder="https://github.com/seu-usuario"
-                      className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-2">LinkedIn</label>
-                    <input
-                      type="url"
-                      name="linkedinUrl"
-                      value={formData.linkedinUrl}
-                      onChange={handleInputChange}
-                      placeholder="https://linkedin.com/in/seu-perfil"
-                      className="w-full px-4 py-2 bg-[#0a0e27] border border-cyan-500/30 rounded-lg text-cyan-400 placeholder-gray-600 focus:outline-none focus:border-cyan-400"
-                    />
-                  </div>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-cyan-400">Links Profissionais</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Portfolio</label>
+                  <input
+                    type="url"
+                    name="portfolioUrl"
+                    value={formData.portfolioUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                    placeholder="https://seuportfolio.com"
+                  />
                 </div>
-              </div>
-
-              <div className="flex gap-4 pt-6">
-                <button
-                  onClick={() => setCurrentStep(2)}
-                  className="btn-cyber-outline flex-1"
-                >
-                  Voltar
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="btn-cyber flex-1"
-                >
-                  Finalizar Cadastro
-                </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">GitHub</label>
+                  <input
+                    type="url"
+                    name="githubUrl"
+                    value={formData.githubUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                    placeholder="https://github.com/seuperfil"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">LinkedIn</label>
+                  <input
+                    type="url"
+                    name="linkedinUrl"
+                    value={formData.linkedinUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                    placeholder="https://linkedin.com/in/seuperfil"
+                  />
+                </div>
               </div>
             </div>
           )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8">
+            {currentStep > 1 && (
+              <Button
+                onClick={handlePreviousStep}
+                variant="outline"
+                className="border-gray-700 hover:border-gray-600"
+              >
+                Voltar
+              </Button>
+            )}
+            {currentStep < 3 ? (
+              <Button
+                onClick={handleNextStep}
+                className="ml-auto bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600 text-white"
+              >
+                Próximo
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={createProfileMutation.isPending}
+                className="ml-auto bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600 text-white"
+              >
+                {createProfileMutation.isPending ? "Criando perfil..." : "Finalizar Cadastro"}
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Info Section */}
-        <div className="max-w-2xl mx-auto mt-8 card-neon border-magenta-500/30">
-          <h3 className="text-lg font-semibold text-magenta-400 mb-3">
-            🔐 Seus dados estão seguros
-          </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Todos os seus dados são criptografados e armazenados com segurança. 
-            Você controla quem vê suas informações. As empresas veem apenas suas habilidades verificadas, 
-            sem acesso a dados pessoais até que você aceite uma oportunidade.
+        {/* Security Info */}
+        <div className="mt-8 text-center text-gray-400 text-sm max-w-2xl mx-auto">
+          <p>
+            🔒 Seus dados estão protegidos. Sua identidade permanecerá anônima até que você aceite um match.
           </p>
         </div>
       </div>

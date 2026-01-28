@@ -37,3 +37,10 @@
 - [x] Adicionar dados fictícios de vagas (5-10 vagas)
 - [x] Adicionar dados fictícios de matches (10-15 matches)
 - [x] Executar seed e validar dados no banco
+
+## Correção de Validação do Formulário de Cadastro
+- [x] Adicionar validação de campos obrigatórios com mensagens específicas
+- [x] Marcar visualmente campos com erro (borda vermelha)
+- [x] Adicionar mensagens de erro abaixo de cada campo
+- [x] Adicionar botão de preenchimento automático com dados fictícios
+- [x] Testar validação em todos os passos do formulário
