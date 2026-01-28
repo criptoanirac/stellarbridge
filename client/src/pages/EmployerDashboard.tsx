@@ -1,14 +1,37 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Search, Plus, Zap } from "lucide-react";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 /**
  * Employer Dashboard Page
  * Design: Cyberpunk with card-based layout
- * Features: Talent bank access, recent matches, job posting
+ * Features: Talent bank access, recent matches, job posting, notification testing
  */
 export default function EmployerDashboard() {
   const [, setLocation] = useLocation();
+  const { addNotification } = useNotifications();
+
+  const triggerTestNotification = () => {
+    const talents = [
+      { name: "Talent-X-Stellar", skills: ["React", "TypeScript", "Node.js"], match: 95 },
+      { name: "Talent-Y-Stellar", skills: ["Python", "Machine Learning", "Data Science"], match: 88 },
+      { name: "Talent-Z-Stellar", skills: ["UI Design", "Figma", "Prototyping"], match: 92 },
+    ];
+    const randomTalent = talents[Math.floor(Math.random() * talents.length)];
+    const jobs = ["Desenvolvedor Full Stack Senior", "Cientista de Dados", "Designer UI/UX"];
+    const randomJob = jobs[Math.floor(Math.random() * jobs.length)];
+
+    addNotification({
+      type: "match",
+      title: "Novo Match Encontrado!",
+      message: "Encontramos um talento verificado com as habilidades que você procura",
+      talentName: randomTalent.name,
+      talentSkills: randomTalent.skills,
+      matchPercentage: randomTalent.match,
+      jobTitle: randomJob,
+    });
+  };
 
   // Mock data for recent matches
   const recentMatches = [
@@ -105,22 +128,21 @@ export default function EmployerDashboard() {
             </div>
           </div>
 
-          {/* Stats Card */}
+          {/* Test Notifications Card */}
           <div className="lg:col-span-1 card-neon">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-cyan-400">Estatísticas</h2>
+              <h2 className="text-xl font-semibold text-cyan-400">Notificações</h2>
               <Zap className="w-5 h-5 text-cyan-400" />
             </div>
-            <div className="space-y-3">
-              <div>
-                <p className="text-gray-400 text-sm">Vagas Ativas</p>
-                <p className="text-2xl font-bold gradient-cyber-text">5</p>
-              </div>
-              <div>
-                <p className="text-gray-400 text-sm">Matches Recentes</p>
-                <p className="text-2xl font-bold gradient-cyber-text">12</p>
-              </div>
-            </div>
+            <p className="text-gray-400 mb-6 text-sm">
+              Teste o sistema de notificações em tempo real
+            </p>
+            <button
+              className="btn-cyber w-full"
+              onClick={triggerTestNotification}
+            >
+              Gerar Notificação
+            </button>
           </div>
         </div>
 
