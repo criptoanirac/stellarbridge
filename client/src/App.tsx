@@ -13,12 +13,14 @@ import ManageJobs from "./pages/ManageJobs";
 import TalentBank from "./pages/TalentBank";
 import Matchmaking from "./pages/Matchmaking";
 import TalentProfile from "./pages/TalentProfile";
+import TalentSignup from "./pages/TalentSignup";
 
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Onboarding} />
+      <Route path={"/talent-signup"} component={TalentSignup} />
       <Route path={"/employer-dashboard"} component={EmployerDashboard} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/manage-jobs"} component={ManageJobs} />

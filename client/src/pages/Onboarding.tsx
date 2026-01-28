@@ -75,7 +75,7 @@ export default function Onboarding() {
         {/* Action Buttons */}
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-md">
           <button
-            onClick={() => setLocation("/talent-bank")}
+            onClick={() => setLocation("/talent-signup")}
             className="btn-cyber flex-1 text-center"
           >
             Sou Talento
