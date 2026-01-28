@@ -115,6 +115,14 @@ export default function TalentDashboard() {
               <Heart className="w-5 h-5" />
               <span>Vagas Salvas</span>
             </button>
+
+            <button
+              onClick={() => setLocation("/training-hub")}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span>Capacitação</span>
+            </button>
           </nav>
 
           {/* Bottom Actions */}

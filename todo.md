@@ -18,3 +18,14 @@
 - [x] Adicionar endpoint de API para atualizar perfil
 - [x] Integrar modal com backend via tRPC
 - [x] Testar fluxo completo de edição
+
+## Página de Capacitação e Desenvolvimento
+- [x] Criar página TrainingHub com listagem de cursos
+- [x] Adicionar seção de instituições parceiras (Mulheres que Codam, Sebrae, Let's Cocreate)
+- [x] Adicionar filtros por categoria, nível e instituição
+- [x] Criar cards de cursos com informações detalhadas
+- [ ] Adicionar schemas de banco de dados para cursos e inscrições
+- [ ] Implementar sistema de inscrição em cursos
+- [ ] Adicionar rastreamento de progresso de cursos
+- [ ] Integrar com dashboard de candidatas
+- [ ] Testar fluxo completo de capacitação
