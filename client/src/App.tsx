@@ -15,8 +15,8 @@ import Matchmaking from "./pages/Matchmaking";
 import TalentProfile from "./pages/TalentProfile";
 import TalentSignup from "./pages/TalentSignup";
 
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Onboarding} />

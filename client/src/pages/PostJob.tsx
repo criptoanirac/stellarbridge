@@ -2,6 +2,8 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, X, Check } from "lucide-react";
 import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 /**
  * Post Job Page - Interactive Job Posting Form
@@ -95,7 +97,9 @@ export default function PostJob() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const createJob = trpc.job.create.useMutation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       formData.title &&
@@ -104,10 +108,25 @@ export default function PostJob() {
       formData.level &&
       formData.skills.length > 0
     ) {
-      setSubmitted(true);
-      setTimeout(() => {
-        setLocation("/employer-dashboard");
-      }, 2000);
+      try {
+        await createJob.mutateAsync({
+          title: formData.title,
+          description: formData.description,
+          sector: formData.sector,
+          experienceLevel: formData.level.toLowerCase() as "junior" | "mid" | "senior" | "lead",
+          location: formData.location || undefined,
+          requiredSkills: formData.skills,
+        });
+        
+        setSubmitted(true);
+        toast.success("✅ Vaga publicada com sucesso!");
+        setTimeout(() => {
+          setLocation("/employer-dashboard");
+        }, 2000);
+      } catch (error) {
+        console.error("Erro ao publicar vaga:", error);
+        toast.error("Erro ao publicar vaga. Tente novamente.");
+      }
     }
   };
 

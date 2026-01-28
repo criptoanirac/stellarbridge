@@ -2,6 +2,9 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Upload, Plus, X } from "lucide-react";
 import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
 
 /**
  * Talent Signup Page
@@ -99,10 +102,69 @@ export default function TalentSignup() {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Cadastro enviado:", formData);
-    alert("✅ Cadastro realizado com sucesso! Seu perfil foi criado na rede Stellar.");
-    setLocation("/");
+  const { user } = useAuth();
+  const createProfileMutation = trpc.talent.createProfile.useMutation();
+  const addSkillMutation = trpc.talent.addSkill.useMutation();
+  const addEducationMutation = trpc.talent.addEducation.useMutation();
+  const addCertificationMutation = trpc.talent.addCertification.useMutation();
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error("Você precisa estar autenticado para criar um perfil");
+      return;
+    }
+
+    try {
+      // Generate pseudonym from first and last name
+      const pseudonym = `${formData.firstName}-${formData.lastName}-${Math.floor(Math.random() * 10000)}`;
+
+      // Create talent profile
+      const profile = await createProfileMutation.mutateAsync({
+        pseudonym,
+        bio: formData.bio || undefined,
+        currentRole: formData.currentRole || undefined,
+        yearsExperience: formData.yearsExperience || undefined,
+        industry: formData.industry || undefined,
+        location: formData.location || undefined,
+        portfolioUrl: formData.portfolioUrl || undefined,
+        githubUrl: formData.githubUrl || undefined,
+        linkedinUrl: formData.linkedinUrl || undefined,
+      });
+
+      const talentId = (profile as any).insertId as number;
+
+      // Add skills
+      for (const skill of formData.skills) {
+        await addSkillMutation.mutateAsync({
+          talentId,
+          skill,
+        });
+      }
+
+      // Add education
+      for (const edu of formData.education) {
+        await addEducationMutation.mutateAsync({
+          talentId,
+          institution: edu.school,
+          course: edu.degree,
+          completionYear: edu.year ? parseInt(edu.year) : undefined,
+        });
+      }
+
+      // Add certifications
+      for (const cert of formData.certifications) {
+        await addCertificationMutation.mutateAsync({
+          talentId,
+          certification: cert,
+        });
+      }
+
+      toast.success("✅ Cadastro realizado com sucesso! Seu perfil foi criado na rede Stellar.");
+      setLocation("/");
+    } catch (error) {
+      console.error("Erro ao criar perfil:", error);
+      toast.error("Erro ao criar perfil. Tente novamente.");
+    }
   };
 
   const isStep1Valid = formData.firstName && formData.lastName && formData.email && formData.phone;
