@@ -89,12 +89,20 @@ export default function EmployerDashboard() {
             <p className="text-gray-400 mb-6 text-sm">
               Publique uma nova oportunidade e receba matches automáticos
             </p>
-            <button
-              className="btn-cyber-outline w-full"
-              onClick={() => setLocation("/post-job")}
-            >
-              Publicar Nova Vaga
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="btn-cyber-outline flex-1"
+                onClick={() => setLocation("/post-job")}
+              >
+                Publicar
+              </button>
+              <button
+                className="btn-cyber-outline flex-1"
+                onClick={() => setLocation("/manage-jobs")}
+              >
+                Gerenciar
+              </button>
+            </div>
           </div>
 
           {/* Stats Card */}
