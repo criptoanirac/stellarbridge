@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Onboarding from "./pages/Onboarding";
 import EmployerDashboard from "./pages/EmployerDashboard";
+import PostJob from "./pages/PostJob";
 import TalentBank from "./pages/TalentBank";
 import Matchmaking from "./pages/Matchmaking";
 import TalentProfile from "./pages/TalentProfile";
@@ -16,6 +17,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Onboarding} />
       <Route path={"/employer-dashboard"} component={EmployerDashboard} />
+      <Route path={"/post-job"} component={PostJob} />
       <Route path={"/talent-bank"} component={TalentBank} />
       <Route path={"/matchmaking/:talentId"} component={Matchmaking} />
       <Route path={"/talent-profile/:talentId"} component={TalentProfile} />

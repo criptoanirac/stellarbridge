@@ -91,7 +91,7 @@ export default function EmployerDashboard() {
             </p>
             <button
               className="btn-cyber-outline w-full"
-              onClick={() => alert("Funcionalidade em desenvolvimento")}
+              onClick={() => setLocation("/post-job")}
             >
               Publicar Nova Vaga
             </button>
