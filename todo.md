@@ -29,3 +29,11 @@
 - [ ] Adicionar rastreamento de progresso de cursos
 - [ ] Integrar com dashboard de candidatas
 - [ ] Testar fluxo completo de capacitação
+
+## Seed de Dados Fictícios
+- [x] Criar script seed-db.mjs para popular banco de dados
+- [x] Adicionar dados fictícios de candidatas (5-10 perfis)
+- [x] Adicionar dados fictícios de empresas (3-5 empresas)
+- [x] Adicionar dados fictícios de vagas (5-10 vagas)
+- [x] Adicionar dados fictícios de matches (10-15 matches)
+- [x] Executar seed e validar dados no banco
