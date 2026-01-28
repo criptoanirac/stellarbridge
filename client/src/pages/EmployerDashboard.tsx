@@ -6,30 +6,45 @@ import { useNotifications } from "@/contexts/NotificationContext";
 /**
  * Employer Dashboard Page
  * Design: Cyberpunk with card-based layout
- * Features: Talent bank access, recent matches, job posting, notification testing
+ * Features: Talent bank access, recent matches, job posting, notification testing with filters
  */
 export default function EmployerDashboard() {
   const [, setLocation] = useLocation();
   const { addNotification } = useNotifications();
 
   const triggerTestNotification = () => {
-    const talents = [
-      { name: "Talent-X-Stellar", skills: ["React", "TypeScript", "Node.js"], match: 95 },
-      { name: "Talent-Y-Stellar", skills: ["Python", "Machine Learning", "Data Science"], match: 88 },
-      { name: "Talent-Z-Stellar", skills: ["UI Design", "Figma", "Prototyping"], match: 92 },
+    const jobTalentPairs = [
+      {
+        job: "Desenvolvedor Full Stack Senior",
+        talent: { name: "Talent-X-Stellar", skills: ["React", "TypeScript", "Node.js"], match: 95 },
+      },
+      {
+        job: "Cientista de Dados",
+        talent: { name: "Talent-Y-Stellar", skills: ["Python", "Machine Learning", "Data Science"], match: 88 },
+      },
+      {
+        job: "Designer UI/UX",
+        talent: { name: "Talent-Z-Stellar", skills: ["UI Design", "Figma", "Prototyping"], match: 92 },
+      },
+      {
+        job: "Desenvolvedor Backend",
+        talent: { name: "Talent-A-Stellar", skills: ["Node.js", "PostgreSQL", "Docker"], match: 87 },
+      },
+      {
+        job: "Product Manager",
+        talent: { name: "Talent-B-Stellar", skills: ["Product Strategy", "Analytics", "Leadership"], match: 91 },
+      },
     ];
-    const randomTalent = talents[Math.floor(Math.random() * talents.length)];
-    const jobs = ["Desenvolvedor Full Stack Senior", "Cientista de Dados", "Designer UI/UX"];
-    const randomJob = jobs[Math.floor(Math.random() * jobs.length)];
+    const randomPair = jobTalentPairs[Math.floor(Math.random() * jobTalentPairs.length)];
 
     addNotification({
       type: "match",
       title: "Novo Match Encontrado!",
       message: "Encontramos um talento verificado com as habilidades que você procura",
-      talentName: randomTalent.name,
-      talentSkills: randomTalent.skills,
-      matchPercentage: randomTalent.match,
-      jobTitle: randomJob,
+      talentName: randomPair.talent.name,
+      talentSkills: randomPair.talent.skills,
+      matchPercentage: randomPair.talent.match,
+      jobTitle: randomPair.job,
     });
   };
 
@@ -135,7 +150,7 @@ export default function EmployerDashboard() {
               <Zap className="w-5 h-5 text-cyan-400" />
             </div>
             <p className="text-gray-400 mb-6 text-sm">
-              Teste o sistema de notificações em tempo real
+              Teste o sistema com filtros avançados
             </p>
             <button
               className="btn-cyber w-full"

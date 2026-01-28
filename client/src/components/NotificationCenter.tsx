@@ -1,16 +1,33 @@
 import { useNotifications } from "@/contexts/NotificationContext";
-import { Bell, X, Check, AlertCircle } from "lucide-react";
+import { Bell, X, Check, AlertCircle, Filter } from "lucide-react";
 import { useState } from "react";
 
 /**
  * Notification Center Component
  * Design: Cyberpunk notification panel with real-time match alerts
- * Features: Toast notifications, notification center panel, mark as read
+ * Features: Toast notifications, notification center panel, mark as read, advanced filters
  */
 export function NotificationCenter() {
-  const { notifications, unreadCount, markAsRead, removeNotification, markAllAsRead } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    removeNotification,
+    markAllAsRead,
+    filterByJob,
+    filterByCompatibility,
+    filterByType,
+    getFilteredNotifications,
+    activeFilters,
+    clearFilters,
+    getUniqueJobs,
+  } = useNotifications();
+
   const [showPanel, setShowPanel] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filteredNotifications = getFilteredNotifications();
+  const uniqueJobs = getUniqueJobs();
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -57,6 +74,9 @@ export function NotificationCenter() {
     }
   };
 
+  const hasActiveFilters =
+    activeFilters.jobTitle || activeFilters.minCompatibility || activeFilters.type;
+
   return (
     <>
       {/* Notification Bell Icon */}
@@ -80,14 +100,17 @@ export function NotificationCenter() {
             <div className="p-4 border-b border-cyan-500/20 flex items-center justify-between bg-cyan-500/5">
               <h3 className="text-lg font-semibold text-cyan-400">Notificações</h3>
               <div className="flex items-center gap-2">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={markAllAsRead}
-                    className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
-                  >
-                    Marcar todas como lidas
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`p-1 rounded transition-colors ${
+                    hasActiveFilters
+                      ? "text-magenta-400 bg-magenta-500/20"
+                      : "text-gray-400 hover:text-cyan-400"
+                  }`}
+                  title="Filtros"
+                >
+                  <Filter className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => setShowPanel(false)}
                   className="text-gray-400 hover:text-cyan-400 transition-colors"
@@ -97,16 +120,93 @@ export function NotificationCenter() {
               </div>
             </div>
 
+            {/* Filter Section */}
+            {showFilters && (
+              <div className="p-4 border-b border-cyan-500/20 bg-cyan-500/5 space-y-3">
+                {/* Job Filter */}
+                <div>
+                  <label className="text-xs text-gray-400 mb-2 block">Filtrar por Vaga</label>
+                  <select
+                    value={activeFilters.jobTitle || ""}
+                    onChange={(e) => filterByJob(e.target.value || null)}
+                    className="w-full px-2 py-1 bg-[#0a0e27] border border-cyan-500/30 rounded text-sm text-cyan-400 focus:outline-none focus:border-cyan-400"
+                  >
+                    <option value="">Todas as vagas</option>
+                    {uniqueJobs.map((job) => (
+                      <option key={job} value={job}>
+                        {job}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Compatibility Filter */}
+                <div>
+                  <label className="text-xs text-gray-400 mb-2 block">
+                    Compatibilidade Mínima: {activeFilters.minCompatibility || "Nenhuma"}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={activeFilters.minCompatibility || 0}
+                    onChange={(e) =>
+                      filterByCompatibility(
+                        e.target.value === "0" ? null : parseInt(e.target.value)
+                      )
+                    }
+                    className="w-full h-2 bg-cyan-500/20 rounded-lg appearance-none cursor-pointer accent-magenta-500"
+                  />
+                </div>
+
+                {/* Type Filter */}
+                <div>
+                  <label className="text-xs text-gray-400 mb-2 block">Tipo de Notificação</label>
+                  <select
+                    value={activeFilters.type || ""}
+                    onChange={(e) => filterByType(e.target.value || null)}
+                    className="w-full px-2 py-1 bg-[#0a0e27] border border-cyan-500/30 rounded text-sm text-cyan-400 focus:outline-none focus:border-cyan-400"
+                  >
+                    <option value="">Todos os tipos</option>
+                    <option value="match">Novos Matches</option>
+                    <option value="update">Atualizações</option>
+                    <option value="success">Sucesso</option>
+                    <option value="warning">Avisos</option>
+                  </select>
+                </div>
+
+                {/* Clear Filters */}
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="w-full px-2 py-1 text-xs bg-magenta-500/20 text-magenta-400 rounded hover:bg-magenta-500/30 transition-colors"
+                  >
+                    Limpar Filtros
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Notifications List */}
             <div className="overflow-y-auto flex-1">
-              {notifications.length === 0 ? (
+              {filteredNotifications.length === 0 ? (
                 <div className="p-8 text-center text-gray-400">
                   <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>Nenhuma notificação no momento</p>
+                  <p>
+                    {hasActiveFilters
+                      ? "Nenhuma notificação corresponde aos filtros"
+                      : "Nenhuma notificação no momento"}
+                  </p>
                 </div>
               ) : (
                 <div className="divide-y divide-cyan-500/10">
-                  {notifications.map((notif) => (
+                  <div className="p-3 bg-cyan-500/5 border-b border-cyan-500/20">
+                    <p className="text-xs text-gray-400">
+                      Mostrando {filteredNotifications.length} de {notifications.length}
+                    </p>
+                  </div>
+                  {filteredNotifications.map((notif) => (
                     <div
                       key={notif.id}
                       onClick={() => markAsRead(notif.id)}
@@ -186,13 +286,27 @@ export function NotificationCenter() {
                 </div>
               )}
             </div>
+
+            {/* Footer */}
+            {notifications.length > 0 && (
+              <div className="p-3 border-t border-cyan-500/20 bg-cyan-500/5 flex gap-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="flex-1 text-xs px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded hover:bg-cyan-500/30 transition-colors"
+                  >
+                    Marcar como lidas
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
 
       {/* Toast Notifications (Top-right corner) */}
       <div className="fixed top-4 right-4 z-40 space-y-2 pointer-events-none">
-        {notifications.slice(0, 3).map((notif) => (
+        {filteredNotifications.slice(0, 3).map((notif) => (
           <div
             key={notif.id}
             className={`pointer-events-auto p-4 rounded-lg border backdrop-blur-sm animate-in fade-in slide-in-from-right-4 duration-300 ${getNotificationColor(
