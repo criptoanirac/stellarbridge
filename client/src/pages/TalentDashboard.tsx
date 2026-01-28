@@ -5,6 +5,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import EditProfileModal from "@/components/EditProfileModal";
 
 /**
  * Talent Dashboard Page
@@ -14,6 +15,7 @@ import { toast } from "sonner";
 export default function TalentDashboard() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"profile" | "matches" | "saved">("profile");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { user, logout } = useAuth();
   
   // Fetch talent profile
@@ -139,9 +141,18 @@ export default function TalentDashboard() {
           {/* Profile Tab */}
           {activeTab === "profile" && (
             <div className="max-w-4xl mx-auto space-y-6">
-              <h1 className="text-4xl font-space-mono font-bold bg-gradient-to-r from-cyan-400 to-magenta-400 bg-clip-text text-transparent mb-8">
-                Meu Perfil
-              </h1>
+              <div className="flex items-center justify-between mb-8">
+                <h1 className="text-4xl font-space-mono font-bold bg-gradient-to-r from-cyan-400 to-magenta-400 bg-clip-text text-transparent">
+                  Meu Perfil
+                </h1>
+                <Button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="bg-gradient-to-r from-cyan-500 to-magenta-500"
+                >
+                  <Settings className="w-5 h-5 mr-2" />
+                  Editar Perfil
+                </Button>
+              </div>
 
               {/* Bio Card */}
               <div className="neon-card p-6">
@@ -313,6 +324,13 @@ export default function TalentDashboard() {
           )}
         </main>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        profile={profile}
+      />
     </div>
   );
 }

@@ -143,6 +143,24 @@ export async function addTalentCertification(certification: InsertTalentCertific
   return db.insert(talentCertifications).values(certification);
 }
 
+export async function deleteTalentSkills(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(talentSkills).where(eq(talentSkills.talentId, talentId));
+}
+
+export async function deleteTalentEducation(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(talentEducation).where(eq(talentEducation.talentId, talentId));
+}
+
+export async function deleteTalentCertifications(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(talentCertifications).where(eq(talentCertifications.talentId, talentId));
+}
+
 export async function getTalentCertifications(talentId: number) {
   const db = await getDb();
   if (!db) return [];

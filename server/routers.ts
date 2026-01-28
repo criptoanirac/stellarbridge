@@ -95,6 +95,72 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return db.addTalentCertification(input);
       }),
+    
+    // Update profile
+    updateProfile: protectedProcedure
+      .input(z.object({
+        bio: z.string().optional(),
+        currentRole: z.string().optional(),
+        yearsExperience: z.string().optional(),
+        industry: z.string().optional(),
+        location: z.string().optional(),
+        portfolioUrl: z.string().optional(),
+        githubUrl: z.string().optional(),
+        linkedinUrl: z.string().optional(),
+        skills: z.array(z.string()).optional(),
+        education: z.array(z.object({
+          institution: z.string(),
+          course: z.string(),
+          completionYear: z.string().optional(),
+        })).optional(),
+        certifications: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const talent = await db.getTalentByUserId(ctx.user.id);
+        if (!talent) throw new Error("Talent profile not found");
+        
+        // Update basic info
+        const { skills, education, certifications, ...basicInfo } = input;
+        await db.updateTalent(talent.id, basicInfo);
+        
+        // Update skills if provided
+        if (skills) {
+          await db.deleteTalentSkills(talent.id);
+          for (const skill of skills) {
+            await db.addTalentSkill({
+              talentId: talent.id,
+              skill,
+              proficiency: "intermediate" as any,
+            });
+          }
+        }
+        
+        // Update education if provided
+        if (education) {
+          await db.deleteTalentEducation(talent.id);
+          for (const edu of education) {
+            await db.addTalentEducation({
+              talentId: talent.id,
+              institution: edu.institution,
+              course: edu.course,
+              completionYear: edu.completionYear ? parseInt(edu.completionYear) : undefined,
+            });
+          }
+        }
+        
+        // Update certifications if provided
+        if (certifications) {
+          await db.deleteTalentCertifications(talent.id);
+          for (const cert of certifications) {
+            await db.addTalentCertification({
+              talentId: talent.id,
+              certification: cert,
+            });
+          }
+        }
+        
+        return { success: true };
+      }),
   }),
   
   // Company routes
