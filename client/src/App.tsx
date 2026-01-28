@@ -14,6 +14,7 @@ import TalentBank from "./pages/TalentBank";
 import Matchmaking from "./pages/Matchmaking";
 import TalentProfile from "./pages/TalentProfile";
 import TalentSignup from "./pages/TalentSignup";
+import TalentDashboard from "./pages/TalentDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,6 +22,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Onboarding} />
       <Route path={"/talent-signup"} component={TalentSignup} />
+      <Route path={"/talent-dashboard"} component={TalentDashboard} />
       <Route path={"/employer-dashboard"} component={EmployerDashboard} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/manage-jobs"} component={ManageJobs} />

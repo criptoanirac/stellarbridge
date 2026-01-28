@@ -160,7 +160,7 @@ export default function TalentSignup() {
       }
 
       toast.success("✅ Cadastro realizado com sucesso! Seu perfil foi criado na rede Stellar.");
-      setLocation("/");
+      setLocation("/talent-dashboard");
     } catch (error) {
       console.error("Erro ao criar perfil:", error);
       toast.error("Erro ao criar perfil. Tente novamente.");
