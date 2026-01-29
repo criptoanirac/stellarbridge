@@ -73,7 +73,7 @@ export default function Onboarding() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-6 w-full max-w-md">
+        <div className="flex flex-col md:flex-row gap-6 w-full max-w-md mb-20">
           <button
             onClick={() => setLocation("/talent-signup")}
             className="btn-cyber flex-1 text-center"
@@ -90,7 +90,7 @@ export default function Onboarding() {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-6 text-center text-gray-500 text-sm">
+        <div className="mt-auto pt-8 pb-6 text-center text-gray-500 text-sm">
           <p>Conectando talento verificado a oportunidades reais</p>
         </div>
       </div>

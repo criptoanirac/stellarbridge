@@ -66,3 +66,8 @@
 - [x] Verificar e corrigir todas as demais páginas
 - [x] Aplicar bg-dark-bg ou bg-[#0a0e27] onde necessário
 - [x] Testar visual em todas as páginas
+
+## Correção de Sobreposição na Página Inicial
+- [x] Ajustar espaçamento entre botões e texto descritivo
+- [x] Aumentar margem inferior dos botões
+- [x] Testar responsividade em diferentes tamanhos de tela
