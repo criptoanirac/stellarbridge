@@ -139,7 +139,7 @@ export default function PostJob() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen grid-bg relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen bg-dark-bg grid-bg relative overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27] opacity-80" />
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-magenta-500/10 rounded-full blur-3xl" />
@@ -163,7 +163,7 @@ export default function PostJob() {
   }
 
   return (
-    <div className="min-h-screen grid-bg relative overflow-hidden">
+    <div className="min-h-screen bg-dark-bg grid-bg relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27] opacity-80" />
 

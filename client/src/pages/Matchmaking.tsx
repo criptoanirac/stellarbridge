@@ -33,7 +33,7 @@ export default function Matchmaking() {
   const matchPercentage = Math.round((matchedSkills.length / jobRequirements.length) * 100);
 
   return (
-    <div className="min-h-screen grid-bg relative overflow-hidden">
+    <div className="min-h-screen bg-dark-bg grid-bg relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e27] via-[#1a1f3a] to-[#0a0e27] opacity-80" />
       

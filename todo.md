@@ -50,3 +50,11 @@
 - [x] Verificar schema da tabela e campos obrigatórios
 - [x] Corrigir mutation createProfile no backend
 - [x] Testar criação de perfil após correção
+
+## Correção de Tema Dark Mode
+- [x] Verificar todas as páginas com fundo branco
+- [x] Aplicar tema dark em TalentDashboard
+- [x] Aplicar tema dark em TrainingHub
+- [x] Aplicar tema dark em ManageJobs
+- [x] Aplicar tema dark em PostJob
+- [x] Testar visual em todas as páginas
