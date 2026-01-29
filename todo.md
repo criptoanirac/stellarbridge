@@ -58,3 +58,11 @@
 - [x] Aplicar tema dark em ManageJobs
 - [x] Aplicar tema dark em PostJob
 - [x] Testar visual em todas as páginas
+
+## Correção Final de Tema Dark Mode
+- [x] Verificar e corrigir tela inicial (Onboarding)
+- [x] Verificar e corrigir página de Capacitação (TrainingHub)
+- [x] Verificar e corrigir Área da Empresa (EmployerDashboard)
+- [x] Verificar e corrigir todas as demais páginas
+- [x] Aplicar bg-dark-bg ou bg-[#0a0e27] onde necessário
+- [x] Testar visual em todas as páginas
