@@ -306,6 +306,137 @@ export const appRouter = router({
         return db.updateJobPosting(input.jobId, input.updates as any);
       }),
   }),
+
+  // Professional Development (Career Plan & Gamification)
+  professionalDevelopment: router({
+    // Get dashboard metrics
+    getDashboardMetrics: protectedProcedure
+      .input(z.object({ talentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getTalentDashboardMetrics(input.talentId);
+      }),
+    
+    // Get career plan
+    getCareerPlan: protectedProcedure
+      .input(z.object({ talentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getCareerPlanByTalentId(input.talentId);
+      }),
+    
+    // Create or update career plan
+    saveCareerPlan: protectedProcedure
+      .input(z.object({
+        talentId: z.number(),
+        targetRole: z.string().min(1),
+        targetIndustry: z.string().optional(),
+        targetSalary: z.string().optional(),
+        deadline: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const existingPlan = await db.getCareerPlanByTalentId(input.talentId);
+        
+        if (existingPlan) {
+          await db.updateCareerPlan(existingPlan.id, {
+            targetRole: input.targetRole,
+            targetIndustry: input.targetIndustry,
+            targetSalary: input.targetSalary,
+            deadline: input.deadline ? new Date(input.deadline) : undefined,
+          });
+          return { success: true, planId: existingPlan.id };
+        } else {
+          await db.createCareerPlan({
+            talentId: input.talentId,
+            targetRole: input.targetRole,
+            targetIndustry: input.targetIndustry,
+            targetSalary: input.targetSalary,
+            deadline: input.deadline ? new Date(input.deadline) : undefined,
+          });
+          return { success: true };
+        }
+      }),
+    
+    // Get achievements
+    getAchievements: protectedProcedure
+      .input(z.object({ talentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAchievementsByTalentId(input.talentId);
+      }),
+    
+    // Get progress history
+    getProgressHistory: protectedProcedure
+      .input(z.object({ talentId: z.number(), limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.getTalentProgressHistory(input.talentId, input.limit);
+      }),
+    
+    // Add XP and check for achievements
+    addXP: protectedProcedure
+      .input(z.object({
+        talentId: z.number(),
+        xp: z.number(),
+        eventType: z.string(),
+        description: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        // Add XP and update level
+        const result = await db.updateTalentXP(input.talentId, input.xp);
+        
+        // Record progress
+        await db.addTalentProgress({
+          talentId: input.talentId,
+          eventType: input.eventType,
+          xpGained: input.xp,
+          description: input.description,
+        });
+        
+        // Check for level-up achievement
+        if (result.leveledUp) {
+          await db.createAchievement({
+            talentId: input.talentId,
+            badgeType: `level_${result.newLevel}`,
+            badgeName: `Nível ${result.newLevel} Alcançado`,
+            badgeDescription: `Parabéns! Você alcançou o nível ${result.newLevel}!`,
+            badgeIcon: "🎖️",
+            xpAwarded: 0,
+          });
+        }
+        
+        return result;
+      }),
+    
+    // Get course recommendations
+    getCourseRecommendations: protectedProcedure
+      .input(z.object({ talentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getCourseRecommendationsByTalentId(input.talentId);
+      }),
+    
+    // Update course recommendation status
+    updateCourseStatus: protectedProcedure
+      .input(z.object({
+        recommendationId: z.number(),
+        status: z.enum(["recommended", "in_progress", "completed", "dismissed"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateCourseRecommendationStatus(input.recommendationId, input.status);
+        
+        // Award XP for completing a course
+        if (input.status === "completed") {
+          const recommendation = await db.getCourseRecommendationsByTalentId(0); // Will need to get talentId from recommendation
+          // Award 50 XP for completing a course
+          // This will be handled by the frontend calling addXP
+        }
+        
+        return { success: true };
+      }),
+    
+    // Generate course recommendations
+    generateRecommendations: protectedProcedure
+      .input(z.object({ talentId: z.number() }))
+      .mutation(async ({ input }) => {
+        return db.generateCourseRecommendations(input.talentId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

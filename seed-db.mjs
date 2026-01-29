@@ -13,6 +13,10 @@ async function seed() {
     // Clear existing data (except users table)
     console.log("🗑️  Clearing existing data...");
     await db.delete(schema.successStories);
+    await db.delete(schema.courseRecommendations);
+    await db.delete(schema.talentProgress);
+    await db.delete(schema.achievements);
+    await db.delete(schema.careerPlans);
     await db.delete(schema.notifications);
     await db.delete(schema.matches);
     await db.delete(schema.jobPostings);
@@ -35,6 +39,8 @@ async function seed() {
         location: "São Paulo, SP",
         birthDate: new Date('1990-05-15'),
         identityVerified: true,
+        xp: 250,
+        level: 3,
       },
       {
         userId: 2,
@@ -46,6 +52,8 @@ async function seed() {
         location: "Rio de Janeiro, RJ",
         birthDate: new Date('1993-08-22'),
         identityVerified: true,
+        xp: 180,
+        level: 2,
       },
       {
         userId: 3,
@@ -433,9 +441,145 @@ async function seed() {
       },
     ]);
 
+    // Insert career plans
+    console.log("🎯 Inserting career plans...");
+    await db.insert(schema.careerPlans).values([
+      {
+        talentId: 1,
+        targetRole: "Tech Lead",
+        targetIndustry: "Tecnologia",
+        targetSalary: "15000",
+        deadline: new Date('2026-12-31'),
+      },
+      {
+        talentId: 2,
+        targetRole: "Head of Design",
+        targetIndustry: "Design",
+        targetSalary: "12000",
+        deadline: new Date('2027-06-30'),
+      },
+    ]);
+
+    // Insert achievements
+    console.log("🏆 Inserting achievements...");
+    await db.insert(schema.achievements).values([
+      {
+        talentId: 1,
+        badgeType: "first_certification",
+        badgeName: "Primeira Certificação",
+        badgeDescription: "Parabéns por completar sua primeira certificação!",
+        badgeIcon: "🎓",
+        xpAwarded: 50,
+      },
+      {
+        talentId: 1,
+        badgeType: "level_3",
+        badgeName: "Nível 3 Alcançado",
+        badgeDescription: "Você alcançou o nível 3!",
+        badgeIcon: "🎯",
+        xpAwarded: 0,
+      },
+      {
+        talentId: 2,
+        badgeType: "first_certification",
+        badgeName: "Primeira Certificação",
+        badgeDescription: "Parabéns por completar sua primeira certificação!",
+        badgeIcon: "🎓",
+        xpAwarded: 50,
+      },
+    ]);
+
+    // Insert talent progress
+    console.log("📈 Inserting talent progress...");
+    await db.insert(schema.talentProgress).values([
+      {
+        talentId: 1,
+        eventType: "profile_completed",
+        xpGained: 50,
+        description: "Perfil completo criado",
+      },
+      {
+        talentId: 1,
+        eventType: "certification_added",
+        xpGained: 100,
+        description: "Certificação adicionada",
+      },
+      {
+        talentId: 1,
+        eventType: "skill_verified",
+        xpGained: 50,
+        description: "Habilidade verificada",
+      },
+      {
+        talentId: 1,
+        eventType: "career_plan_created",
+        xpGained: 50,
+        description: "Plano de carreira definido",
+      },
+      {
+        talentId: 2,
+        eventType: "profile_completed",
+        xpGained: 50,
+        description: "Perfil completo criado",
+      },
+      {
+        talentId: 2,
+        eventType: "certification_added",
+        xpGained: 100,
+        description: "Certificação adicionada",
+      },
+      {
+        talentId: 2,
+        eventType: "career_plan_created",
+        xpGained: 30,
+        description: "Plano de carreira definido",
+      },
+    ]);
+
+    // Insert course recommendations
+    console.log("📚 Inserting course recommendations...");
+    await db.insert(schema.courseRecommendations).values([
+      {
+        talentId: 1,
+        courseName: "Liderança Técnica e Gestão de Times",
+        provider: "Alura",
+        category: "Leadership",
+        skillsToGain: JSON.stringify(["Liderança", "Gestão de Pessoas", "Comunicação"]),
+        priority: 10,
+        reason: "Essencial para alcançar seu objetivo: Tech Lead",
+        courseUrl: "https://www.alura.com.br/curso-online-lideranca-tecnica",
+        estimatedDuration: "8 semanas",
+        status: "recommended",
+      },
+      {
+        talentId: 1,
+        courseName: "Arquitetura de Microsserviços",
+        provider: "Udemy",
+        category: "Architecture",
+        skillsToGain: JSON.stringify(["Microsserviços", "Docker", "Kubernetes"]),
+        priority: 9,
+        reason: "Habilidade técnica avançada para Tech Leads",
+        courseUrl: "https://www.udemy.com/course/microservices-architecture/",
+        estimatedDuration: "10 semanas",
+        status: "in_progress",
+      },
+      {
+        talentId: 2,
+        courseName: "Design System Avançado",
+        provider: "Interaction Design Foundation",
+        category: "Design",
+        skillsToGain: JSON.stringify(["Design Systems", "Component Library", "Design Tokens"]),
+        priority: 10,
+        reason: "Fundamental para Head of Design",
+        courseUrl: "https://www.interaction-design.org/courses/design-systems",
+        estimatedDuration: "6 semanas",
+        status: "recommended",
+      },
+    ]);
+
     console.log("✅ Database seeded successfully!");
     console.log("\n📊 Summary:");
-    console.log("- 7 talents created");
+    console.log("- 7 talents created (with XP and levels)");
     console.log("- 28 skills added");
     console.log("- 7 education records added");
     console.log("- 7 certifications added");
@@ -443,6 +587,10 @@ async function seed() {
     console.log("- 7 job postings created (with salary ranges)");
     console.log("- 8 matches created (3 hired)");
     console.log("- 3 success stories added");
+    console.log("- 2 career plans created");
+    console.log("- 3 achievements added");
+    console.log("- 7 progress records added");
+    console.log("- 3 course recommendations added");
     
     process.exit(0);
   } catch (error) {

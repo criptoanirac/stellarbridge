@@ -1,6 +1,6 @@
 import { eq, sql, desc, asc, and, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories } from "../drizzle/schema";
+import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories, careerPlans, InsertCareerPlan, achievements, InsertAchievement, talentProgress, InsertTalentProgress, courseRecommendations, InsertCourseRecommendation } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -531,4 +531,280 @@ export async function createSuccessStory(story: any) {
   if (!db) throw new Error("Database not available");
   const result = await db.insert(successStories).values(story);
   return result;
+}
+
+// Career Plan functions
+export async function getCareerPlanByTalentId(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const plans = await db
+    .select()
+    .from(careerPlans)
+    .where(eq(careerPlans.talentId, talentId))
+    .orderBy(desc(careerPlans.createdAt));
+  
+  return plans[0] || null;
+}
+
+export async function createCareerPlan(plan: InsertCareerPlan) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(careerPlans).values(plan);
+}
+
+export async function updateCareerPlan(planId: number, updates: Partial<InsertCareerPlan>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(careerPlans).set(updates).where(eq(careerPlans.id, planId));
+}
+
+// Achievement functions
+export async function getAchievementsByTalentId(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .select()
+    .from(achievements)
+    .where(eq(achievements.talentId, talentId))
+    .orderBy(desc(achievements.unlockedAt));
+}
+
+export async function createAchievement(achievement: InsertAchievement) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(achievements).values(achievement);
+}
+
+// Talent Progress functions
+export async function getTalentProgressHistory(talentId: number, limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .select()
+    .from(talentProgress)
+    .where(eq(talentProgress.talentId, talentId))
+    .orderBy(desc(talentProgress.createdAt))
+    .limit(limit);
+}
+
+export async function addTalentProgress(progress: InsertTalentProgress) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(talentProgress).values(progress);
+}
+
+// Update talent XP and level
+export async function updateTalentXP(talentId: number, xpToAdd: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const talent = await db.select().from(talents).where(eq(talents.id, talentId)).limit(1);
+  if (!talent[0]) throw new Error("Talent not found");
+  
+  const currentXP = talent[0].xp || 0;
+  const currentLevel = talent[0].level || 1;
+  const newXP = currentXP + xpToAdd;
+  
+  // Level up logic: 100 XP per level
+  const newLevel = Math.floor(newXP / 100) + 1;
+  
+  await db.update(talents).set({ xp: newXP, level: newLevel }).where(eq(talents.id, talentId));
+  
+  return { newXP, newLevel, leveledUp: newLevel > currentLevel };
+}
+
+// Course Recommendations functions
+export async function getCourseRecommendationsByTalentId(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .select()
+    .from(courseRecommendations)
+    .where(eq(courseRecommendations.talentId, talentId))
+    .orderBy(desc(courseRecommendations.priority));
+}
+
+export async function createCourseRecommendation(recommendation: InsertCourseRecommendation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(courseRecommendations).values(recommendation);
+}
+
+export async function updateCourseRecommendationStatus(
+  recommendationId: number,
+  status: "recommended" | "in_progress" | "completed" | "dismissed"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db
+    .update(courseRecommendations)
+    .set({ status })
+    .where(eq(courseRecommendations.id, recommendationId));
+}
+
+// Get talent dashboard metrics
+export async function getTalentDashboardMetrics(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const talent = await db.select().from(talents).where(eq(talents.id, talentId)).limit(1);
+  if (!talent[0]) throw new Error("Talent not found");
+  
+  const skillsCount = await db.select({ count: sql<number>`count(*)` }).from(talentSkills).where(eq(talentSkills.talentId, talentId));
+  const certsCount = await db.select({ count: sql<number>`count(*)` }).from(talentCertifications).where(eq(talentCertifications.talentId, talentId));
+  const matchesCount = await db.select({ count: sql<number>`count(*)` }).from(matches).where(eq(matches.talentId, talentId));
+  const achievementsCount = await db.select({ count: sql<number>`count(*)` }).from(achievements).where(eq(achievements.talentId, talentId));
+  
+  return {
+    xp: talent[0].xp || 0,
+    level: talent[0].level || 1,
+    skillsCount: skillsCount[0]?.count || 0,
+    certificationsCount: certsCount[0]?.count || 0,
+    matchesCount: matchesCount[0]?.count || 0,
+    achievementsCount: achievementsCount[0]?.count || 0,
+  };
+}
+
+// Generate course recommendations based on skills gap
+export async function generateCourseRecommendations(talentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get talent's current skills
+  const currentSkills = await db.select().from(talentSkills).where(eq(talentSkills.talentId, talentId));
+  const skillNames = currentSkills.map(s => s.skill.toLowerCase());
+  
+  // Get talent's career plan
+  const careerPlan = await db.select().from(careerPlans).where(eq(careerPlans.talentId, talentId)).limit(1);
+  
+  // Course recommendations based on common career paths
+  const recommendations = [];
+  
+  // If no career plan, recommend foundational courses
+  if (!careerPlan[0]) {
+    recommendations.push(
+      {
+        talentId,
+        courseName: "Fundamentos de Programação",
+        provider: "Coursera",
+        category: "Programming",
+        skillsToGain: JSON.stringify(["Python", "JavaScript", "Lógica de Programação"]),
+        priority: 10,
+        reason: "Curso fundamental para iniciar carreira em tecnologia",
+        courseUrl: "https://www.coursera.org/learn/python",
+        estimatedDuration: "6 semanas",
+      },
+      {
+        talentId,
+        courseName: "Introdução ao Design UX",
+        provider: "Google",
+        category: "Design",
+        skillsToGain: JSON.stringify(["UX Design", "Figma", "Pesquisa de Usuário"]),
+        priority: 8,
+        reason: "Habilidade valorizada no mercado de tecnologia",
+        courseUrl: "https://www.coursera.org/professional-certificates/google-ux-design",
+        estimatedDuration: "6 meses",
+      }
+    );
+  } else {
+    // Recommend based on target role
+    const targetRole = careerPlan[0].targetRole.toLowerCase();
+    
+    if (targetRole.includes("desenvolvedor") || targetRole.includes("developer") || targetRole.includes("programador")) {
+      if (!skillNames.includes("javascript") && !skillNames.includes("python")) {
+        recommendations.push({
+          talentId,
+          courseName: "JavaScript Completo",
+          provider: "Udemy",
+          category: "Programming",
+          skillsToGain: JSON.stringify(["JavaScript", "ES6+", "DOM", "Async/Await"]),
+          priority: 10,
+          reason: `Essencial para alcançar seu objetivo: ${careerPlan[0].targetRole}`,
+          courseUrl: "https://www.udemy.com/course/javascript-completo/",
+          estimatedDuration: "8 semanas",
+        });
+      }
+      
+      if (!skillNames.includes("react") && !skillNames.includes("vue")) {
+        recommendations.push({
+          talentId,
+          courseName: "React - The Complete Guide",
+          provider: "Udemy",
+          category: "Programming",
+          skillsToGain: JSON.stringify(["React", "Hooks", "Redux", "Next.js"]),
+          priority: 9,
+          reason: "Framework mais demandado para desenvolvedores frontend",
+          courseUrl: "https://www.udemy.com/course/react-the-complete-guide/",
+          estimatedDuration: "10 semanas",
+        });
+      }
+    }
+    
+    if (targetRole.includes("designer") || targetRole.includes("ux") || targetRole.includes("ui")) {
+      if (!skillNames.includes("figma") && !skillNames.includes("sketch")) {
+        recommendations.push({
+          talentId,
+          courseName: "Figma Master Course",
+          provider: "Udemy",
+          category: "Design",
+          skillsToGain: JSON.stringify(["Figma", "Prototyping", "Design Systems"]),
+          priority: 10,
+          reason: `Ferramenta essencial para ${careerPlan[0].targetRole}`,
+          courseUrl: "https://www.udemy.com/course/figma-ux-ui-design/",
+          estimatedDuration: "4 semanas",
+        });
+      }
+    }
+    
+    if (targetRole.includes("data") || targetRole.includes("dados") || targetRole.includes("analista")) {
+      if (!skillNames.includes("python") && !skillNames.includes("r")) {
+        recommendations.push({
+          talentId,
+          courseName: "Python para Data Science",
+          provider: "Coursera",
+          category: "Data Science",
+          skillsToGain: JSON.stringify(["Python", "Pandas", "NumPy", "Matplotlib"]),
+          priority: 10,
+          reason: "Base fundamental para trabalhar com dados",
+          courseUrl: "https://www.coursera.org/learn/python-data-analysis",
+          estimatedDuration: "7 semanas",
+        });
+      }
+    }
+  }
+  
+  // Always recommend soft skills
+  recommendations.push({
+    talentId,
+    courseName: "Comunicação Efetiva no Ambiente de Trabalho",
+    provider: "Sebrae",
+    category: "Soft Skills",
+    skillsToGain: JSON.stringify(["Comunicação", "Apresentação", "Trabalho em Equipe"]),
+    priority: 7,
+    reason: "Soft skills são diferenciais em qualquer carreira",
+    courseUrl: "https://www.sebrae.com.br/sites/PortalSebrae/cursosonline",
+    estimatedDuration: "2 semanas",
+  });
+  
+  // Insert recommendations
+  for (const rec of recommendations) {
+    // Check if recommendation already exists
+    const existing = await db
+      .select()
+      .from(courseRecommendations)
+      .where(
+        and(
+          eq(courseRecommendations.talentId, talentId),
+          eq(courseRecommendations.courseName, rec.courseName)
+        )
+      )
+      .limit(1);
+    
+    if (existing.length === 0) {
+      await db.insert(courseRecommendations).values(rec);
+    }
+  }
+  
+  return recommendations;
 }

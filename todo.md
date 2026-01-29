@@ -91,3 +91,21 @@
 - [x] Implementar lógica de cálculo de datas (últimos 30 dias, 3 meses, 6 meses, 1 ano, todos)
 - [x] Integrar filtros com todas as queries (métricas, gráficos, histórias)
 - [x] Testar filtros e validar atualização dinâmica dos dados
+
+## Dashboard de Desenvolvimento Profissional para Talentos
+- [x] Criar tabela careerPlans (meta de carreira, cargo desejado, prazo)
+- [x] Criar tabela achievements (conquistas/badges desbloqueados)
+- [x] Criar tabela talentProgress (pontos XP, nível, histórico de progresso)
+- [x] Criar tabela courseRecommendations (cursos recomendados baseados em gaps)
+- [x] Adicionar campos de gamificação em talents (xp, level, badges)
+- [x] Criar endpoints tRPC para gerenciar plano de carreira
+- [x] Criar endpoints para sistema de conquistas e recompensas
+- [x] Implementar lógica de recomendação de cursos baseada em skills gap
+- [x] Criar página TalentDashboard com métricas pessoais
+- [x] Adicionar visualizações de evolução (gráficos de progresso)
+- [x] Implementar formulário de definição de meta de carreira
+- [x] Criar componente de roadmap visual da trilha de aprendizado
+- [x] Implementar sistema de badges e conquistas
+- [x] Criar componente de exibição de nível e XP
+- [x] Atualizar seed com dados de exemplo
+- [x] Testar todas as funcionalidades

@@ -45,6 +45,9 @@ export const talents = mysqlTable("talents", {
   linkedinUrl: varchar("linkedinUrl", { length: 500 }),
   identityVerified: boolean("identityVerified").default(false).notNull(),
   verificationMethod: varchar("verificationMethod", { length: 100 }),
+  // Gamification fields
+  xp: int("xp").default(0).notNull(),
+  level: int("level").default(1).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -200,6 +203,82 @@ export type SuccessStory = typeof successStories.$inferSelect;
 export type InsertSuccessStory = typeof successStories.$inferInsert;
 
 /**
+ * Career Plans
+ * Stores talent career goals and desired positions
+ */
+export const careerPlans = mysqlTable("careerPlans", {
+  id: int("id").autoincrement().primaryKey(),
+  talentId: int("talentId").notNull(),
+  targetRole: varchar("targetRole", { length: 255 }).notNull(),
+  targetIndustry: varchar("targetIndustry", { length: 255 }),
+  targetSalary: decimal("targetSalary", { precision: 10, scale: 2 }),
+  deadline: timestamp("deadline"),
+  status: mysqlEnum("status", ["active", "completed", "abandoned"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CareerPlan = typeof careerPlans.$inferSelect;
+export type InsertCareerPlan = typeof careerPlans.$inferInsert;
+
+/**
+ * Achievements/Badges
+ * Tracks unlocked achievements for gamification
+ */
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  talentId: int("talentId").notNull(),
+  badgeType: varchar("badgeType", { length: 100 }).notNull(), // e.g., "first_cert", "python_master", "networking_pro"
+  badgeName: varchar("badgeName", { length: 255 }).notNull(),
+  badgeDescription: text("badgeDescription"),
+  badgeIcon: varchar("badgeIcon", { length: 100 }), // emoji or icon name
+  xpAwarded: int("xpAwarded").default(0).notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * Talent Progress History
+ * Tracks XP gains and level ups over time
+ */
+export const talentProgress = mysqlTable("talentProgress", {
+  id: int("id").autoincrement().primaryKey(),
+  talentId: int("talentId").notNull(),
+  eventType: varchar("eventType", { length: 100 }).notNull(), // e.g., "course_completed", "cert_added", "level_up"
+  xpGained: int("xpGained").default(0).notNull(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TalentProgress = typeof talentProgress.$inferSelect;
+export type InsertTalentProgress = typeof talentProgress.$inferInsert;
+
+/**
+ * Course Recommendations
+ * AI-generated course suggestions based on skills gap
+ */
+export const courseRecommendations = mysqlTable("courseRecommendations", {
+  id: int("id").autoincrement().primaryKey(),
+  talentId: int("talentId").notNull(),
+  courseName: varchar("courseName", { length: 255 }).notNull(),
+  provider: varchar("provider", { length: 255 }), // e.g., "Coursera", "Udemy", "Sebrae"
+  category: varchar("category", { length: 100 }), // e.g., "Programming", "Design", "Business"
+  skillsToGain: text("skillsToGain"), // JSON array of skills
+  priority: int("priority").default(0).notNull(), // Higher = more important
+  reason: text("reason"), // Why this course is recommended
+  courseUrl: varchar("courseUrl", { length: 500 }),
+  estimatedDuration: varchar("estimatedDuration", { length: 100 }), // e.g., "4 weeks", "20 hours"
+  status: mysqlEnum("status", ["recommended", "in_progress", "completed", "dismissed"]).default("recommended").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CourseRecommendation = typeof courseRecommendations.$inferSelect;
+export type InsertCourseRecommendation = typeof courseRecommendations.$inferInsert;
+
+/**
  * Relations
  */
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -223,6 +302,10 @@ export const talentsRelations = relations(talents, ({ one, many }) => ({
   education: many(talentEducation),
   certifications: many(talentCertifications),
   matches: many(matches),
+  careerPlans: many(careerPlans),
+  achievements: many(achievements),
+  progress: many(talentProgress),
+  courseRecommendations: many(courseRecommendations),
 }));
 
 export const companiesRelations = relations(companies, ({ one, many }) => ({
@@ -288,5 +371,33 @@ export const successStoriesRelations = relations(successStories, ({ one }) => ({
   company: one(companies, {
     fields: [successStories.companyId],
     references: [companies.id],
+  }),
+}));
+
+export const careerPlansRelations = relations(careerPlans, ({ one }) => ({
+  talent: one(talents, {
+    fields: [careerPlans.talentId],
+    references: [talents.id],
+  }),
+}));
+
+export const achievementsRelations = relations(achievements, ({ one }) => ({
+  talent: one(talents, {
+    fields: [achievements.talentId],
+    references: [talents.id],
+  }),
+}));
+
+export const talentProgressRelations = relations(talentProgress, ({ one }) => ({
+  talent: one(talents, {
+    fields: [talentProgress.talentId],
+    references: [talents.id],
+  }),
+}));
+
+export const courseRecommendationsRelations = relations(courseRecommendations, ({ one }) => ({
+  talent: one(talents, {
+    fields: [courseRecommendations.talentId],
+    references: [talents.id],
   }),
 }));

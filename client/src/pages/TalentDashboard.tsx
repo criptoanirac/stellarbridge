@@ -123,6 +123,14 @@ export default function TalentDashboard() {
               <BookOpen className="w-5 h-5" />
               <span>Capacitação</span>
             </button>
+
+            <button
+              onClick={() => setLocation("/professional-development")}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+            >
+              <Award className="w-5 h-5" />
+              <span>Desenvolvimento</span>
+            </button>
           </nav>
 
           {/* Bottom Actions */}
