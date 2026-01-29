@@ -1,4 +1,4 @@
-import { eq, sql, desc, asc } from "drizzle-orm";
+import { eq, sql, desc, asc, and, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -239,30 +239,77 @@ export async function updateMatch(matchId: number, updates: Partial<InsertMatch>
 }
 
 // Social Impact queries
-export async function getSocialImpactMetrics() {
+export async function getSocialImpactMetrics(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Build date filter conditions
+  const dateConditions = [];
+  if (dateFrom) {
+    dateConditions.push(sql`${talents.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    dateConditions.push(sql`${talents.createdAt} <= ${dateTo}`);
+  }
+  
   // Total de candidatas capacitadas (com pelo menos 1 certificação)
-  const talentsWithCerts = await db
+  let talentsWithCertsQuery = db
     .selectDistinct({ talentId: talentCertifications.talentId })
-    .from(talentCertifications);
+    .from(talentCertifications)
+    .innerJoin(talents, eq(talentCertifications.talentId, talents.id));
+  
+  if (dateConditions.length > 0) {
+    talentsWithCertsQuery = talentsWithCertsQuery.where(sql`${sql.join(dateConditions, sql` AND `)}`) as any;
+  }
+  const talentsWithCerts = await talentsWithCertsQuery;
   
   // Total de vagas preenchidas (matches com status 'hired')
+  const hiredMatchesConditions = [eq(matches.status, "hired")];
+  if (dateFrom) {
+    hiredMatchesConditions.push(sql`${matches.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    hiredMatchesConditions.push(sql`${matches.createdAt} <= ${dateTo}`);
+  }
   const hiredMatches = await db
     .select()
     .from(matches)
-    .where(eq(matches.status, "hired"));
+    .where(and(...hiredMatchesConditions));
   
   // Total de candidatas
-  const allTalents = await db.select().from(talents);
+  let allTalentsQuery = db.select().from(talents);
+  if (dateConditions.length > 0) {
+    allTalentsQuery = allTalentsQuery.where(sql`${sql.join(dateConditions, sql` AND `)}`) as any;
+  }
+  const allTalents = await allTalentsQuery;
   
   // Candidatas com pelo menos 1 match
-  const talentsWithMatches = await db
+  const matchesConditions = [];
+  if (dateFrom) {
+    matchesConditions.push(sql`${matches.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    matchesConditions.push(sql`${matches.createdAt} <= ${dateTo}`);
+  }
+  
+  let talentsWithMatchesQuery = db
     .selectDistinct({ talentId: matches.talentId })
     .from(matches);
   
+  if (matchesConditions.length > 0) {
+    talentsWithMatchesQuery = talentsWithMatchesQuery.where(and(...matchesConditions)) as any;
+  }
+  const talentsWithMatches = await talentsWithMatchesQuery;
+  
   // Salário médio das vagas com contratação
+  const jobsWithHiresConditions = [eq(matches.status, "hired")];
+  if (dateFrom) {
+    jobsWithHiresConditions.push(sql`${matches.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    jobsWithHiresConditions.push(sql`${matches.createdAt} <= ${dateTo}`);
+  }
+  
   const jobsWithHires = await db
     .select({
       salaryMin: jobPostings.salaryMin,
@@ -270,7 +317,7 @@ export async function getSocialImpactMetrics() {
     })
     .from(jobPostings)
     .innerJoin(matches, eq(matches.jobId, jobPostings.id))
-    .where(eq(matches.status, "hired"));
+    .where(and(...jobsWithHiresConditions));
   
   let avgSalary = 0;
   if (jobsWithHires.length > 0) {
@@ -293,28 +340,41 @@ export async function getSocialImpactMetrics() {
   };
 }
 
-export async function getGeographicDistribution() {
+export async function getGeographicDistribution(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Distribuição de talentos por localização
-  const talentsByLocation = await db
+  // Distribuição geográfica de talentos
+  let talentsByLocationQuery = db
     .select({
       location: talents.location,
       count: sql<number>`count(*)`,
     })
-    .from(talents)
-    .groupBy(talents.location);
+    .from(talents);
   
-  // Distribuição de vagas por localização
-  const jobsByLocation = await db
+  if (dateFrom) {
+    talentsByLocationQuery = talentsByLocationQuery.where(sql`${talents.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    talentsByLocationQuery = talentsByLocationQuery.where(sql`${talents.createdAt} <= ${dateTo}`) as any;
+  }
+  const talentsByLocation = await talentsByLocationQuery.groupBy(talents.location);
+  
+  // Distribuição geográfica de vagas
+  let jobsByLocationQuery = db
     .select({
       location: jobPostings.location,
       count: sql<number>`count(*)`,
     })
-    .from(jobPostings)
-    .where(eq(jobPostings.status, "active"))
-    .groupBy(jobPostings.location);
+    .from(jobPostings);
+  
+  if (dateFrom) {
+    jobsByLocationQuery = jobsByLocationQuery.where(sql`${jobPostings.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    jobsByLocationQuery = jobsByLocationQuery.where(sql`${jobPostings.createdAt} <= ${dateTo}`) as any;
+  }
+  const jobsByLocation = await jobsByLocationQuery.groupBy(jobPostings.location);
   
   return {
     talents: talentsByLocation,
@@ -322,34 +382,55 @@ export async function getGeographicDistribution() {
   };
 }
 
-export async function getGrowthTrend() {
+export async function getGrowthTrend(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   // Crescimento mensal de talentos, vagas e matches
-  const talentGrowth = await db
+  let talentGrowthQuery = db
     .select({
       month: sql<string>`DATE_FORMAT(${talents.createdAt}, '%Y-%m') as month`,
       count: sql<number>`count(*) as count`,
     })
-    .from(talents)
-    .groupBy(sql`month`);
+    .from(talents);
   
-  const jobGrowth = await db
+  if (dateFrom) {
+    talentGrowthQuery = talentGrowthQuery.where(sql`${talents.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    talentGrowthQuery = talentGrowthQuery.where(sql`${talents.createdAt} <= ${dateTo}`) as any;
+  }
+  const talentGrowth = await talentGrowthQuery.groupBy(sql`month`);
+  
+  let jobGrowthQuery = db
     .select({
       month: sql<string>`DATE_FORMAT(${jobPostings.createdAt}, '%Y-%m') as month`,
       count: sql<number>`count(*) as count`,
     })
-    .from(jobPostings)
-    .groupBy(sql`month`);
+    .from(jobPostings);
   
-  const matchGrowth = await db
+  if (dateFrom) {
+    jobGrowthQuery = jobGrowthQuery.where(sql`${jobPostings.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    jobGrowthQuery = jobGrowthQuery.where(sql`${jobPostings.createdAt} <= ${dateTo}`) as any;
+  }
+  const jobGrowth = await jobGrowthQuery.groupBy(sql`month`);
+  
+  let matchGrowthQuery = db
     .select({
       month: sql<string>`DATE_FORMAT(${matches.createdAt}, '%Y-%m') as month`,
       count: sql<number>`count(*) as count`,
     })
-    .from(matches)
-    .groupBy(sql`month`);
+    .from(matches);
+  
+  if (dateFrom) {
+    matchGrowthQuery = matchGrowthQuery.where(sql`${matches.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    matchGrowthQuery = matchGrowthQuery.where(sql`${matches.createdAt} <= ${dateTo}`) as any;
+  }
+  const matchGrowth = await matchGrowthQuery.groupBy(sql`month`);
   
   // Sort results in JavaScript
   talentGrowth.sort((a, b) => (a.month || '').localeCompare(b.month || ''));
@@ -363,11 +444,11 @@ export async function getGrowthTrend() {
   };
 }
 
-export async function getSuccessStories() {
+export async function getSuccessStories(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const stories = await db
+  let storiesQuery = db
     .select({
       id: successStories.id,
       testimonial: successStories.testimonial,
@@ -381,18 +462,35 @@ export async function getSuccessStories() {
     })
     .from(successStories)
     .innerJoin(talents, eq(successStories.talentId, talents.id))
-    .innerJoin(companies, eq(successStories.companyId, companies.id))
+    .innerJoin(companies, eq(successStories.companyId, companies.id));
+  
+  if (dateFrom) {
+    storiesQuery = storiesQuery.where(sql`${successStories.createdAt} >= ${dateFrom}`) as any;
+  }
+  if (dateTo) {
+    storiesQuery = storiesQuery.where(sql`${successStories.createdAt} <= ${dateTo}`) as any;
+  }
+  
+  const stories = await storiesQuery
     .orderBy(desc(successStories.createdAt))
     .limit(10);
   
   return stories;
 }
 
-export async function getTopCertifications() {
+export async function getTopCertifications(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   // Certificações mais populares entre candidatas contratadas
+  const topCertsConditions = [eq(matches.status, "hired")];
+  if (dateFrom) {
+    topCertsConditions.push(sql`${matches.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    topCertsConditions.push(sql`${matches.createdAt} <= ${dateTo}`);
+  }
+  
   const topCerts = await db
     .select({
       certification: talentCertifications.certification,
@@ -400,7 +498,7 @@ export async function getTopCertifications() {
     })
     .from(talentCertifications)
     .innerJoin(matches, eq(talentCertifications.talentId, matches.talentId))
-    .where(eq(matches.status, "hired"))
+    .where(and(...topCertsConditions))
     .groupBy(talentCertifications.certification)
     .orderBy(desc(sql`count(*)`))
     .limit(10);
@@ -408,14 +506,22 @@ export async function getTopCertifications() {
   return topCerts;
 }
 
-export async function getActiveCompaniesCount() {
+export async function getActiveCompaniesCount(dateFrom?: string, dateTo?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  const activeCompaniesConditions = [eq(jobPostings.status, "active")];
+  if (dateFrom) {
+    activeCompaniesConditions.push(sql`${jobPostings.createdAt} >= ${dateFrom}`);
+  }
+  if (dateTo) {
+    activeCompaniesConditions.push(sql`${jobPostings.createdAt} <= ${dateTo}`);
+  }
   
   const activeCompanies = await db
     .selectDistinct({ companyId: jobPostings.companyId })
     .from(jobPostings)
-    .where(eq(jobPostings.status, "active"));
+    .where(and(...activeCompaniesConditions));
   
   return activeCompanies.length;
 }

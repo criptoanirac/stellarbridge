@@ -1,14 +1,51 @@
 import { trpc } from "@/lib/trpc";
 import { Users, Briefcase, TrendingUp, DollarSign, Award, Building2, MapPin, Calendar } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState, useMemo } from "react";
+
+type PeriodOption = 'all' | '30d' | '3m' | '6m' | '1y';
 
 export default function SocialImpact() {
-  const { data: metrics, isLoading: metricsLoading } = trpc.socialImpact.getMetrics.useQuery();
-  const { data: geoData, isLoading: geoLoading } = trpc.socialImpact.getGeographicDistribution.useQuery();
-  const { data: growthData, isLoading: growthLoading } = trpc.socialImpact.getGrowthTrend.useQuery();
-  const { data: stories, isLoading: storiesLoading } = trpc.socialImpact.getSuccessStories.useQuery();
-  const { data: topCerts, isLoading: certsLoading } = trpc.socialImpact.getTopCertifications.useQuery();
-  const { data: activeCompanies, isLoading: companiesLoading } = trpc.socialImpact.getActiveCompaniesCount.useQuery();
+  const [period, setPeriod] = useState<PeriodOption>('all');
+  
+  // Calcular datas baseado no período selecionado
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const dateTo = now.toISOString().split('T')[0];
+    
+    if (period === 'all') {
+      return { dateFrom: undefined, dateTo: undefined };
+    }
+    
+    const dateFrom = new Date(now);
+    switch (period) {
+      case '30d':
+        dateFrom.setDate(dateFrom.getDate() - 30);
+        break;
+      case '3m':
+        dateFrom.setMonth(dateFrom.getMonth() - 3);
+        break;
+      case '6m':
+        dateFrom.setMonth(dateFrom.getMonth() - 6);
+        break;
+      case '1y':
+        dateFrom.setFullYear(dateFrom.getFullYear() - 1);
+        break;
+    }
+    
+    return { 
+      dateFrom: dateFrom.toISOString().split('T')[0],
+      dateTo 
+    };
+  }, [period]);
+  
+  const { data: metrics, isLoading: metricsLoading } = trpc.socialImpact.getMetrics.useQuery(dateRange);
+  const { data: geoData, isLoading: geoLoading } = trpc.socialImpact.getGeographicDistribution.useQuery(dateRange);
+  const { data: growthData, isLoading: growthLoading } = trpc.socialImpact.getGrowthTrend.useQuery(dateRange);
+  const { data: stories, isLoading: storiesLoading } = trpc.socialImpact.getSuccessStories.useQuery(dateRange);
+  const { data: topCerts, isLoading: certsLoading } = trpc.socialImpact.getTopCertifications.useQuery(dateRange);
+  const { data: activeCompanies, isLoading: companiesLoading } = trpc.socialImpact.getActiveCompaniesCount.useQuery(dateRange);
 
   const isLoading = metricsLoading || geoLoading || growthLoading || storiesLoading || certsLoading || companiesLoading;
 
@@ -66,13 +103,33 @@ export default function SocialImpact() {
       {/* Header */}
       <div className="bg-gradient-to-r from-cyan/20 to-magenta/20 border-b border-cyan/30">
         <div className="container mx-auto px-6 py-12">
-          <h1 className="text-5xl font-bold font-space-mono mb-4">
-            <span className="text-cyan">Impacto</span>{" "}
-            <span className="text-magenta">Social</span>
-          </h1>
-          <p className="text-gray-300 text-lg max-w-3xl">
-            Transformando vidas através da tecnologia e inclusão. Acompanhe as métricas que mostram como o StellarBridge está construindo pontes para a liberdade profissional.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
+            <div>
+              <h1 className="text-5xl font-bold font-space-mono mb-4">
+                <span className="text-cyan">Impacto</span>{" "}
+                <span className="text-magenta">Social</span>
+              </h1>
+              <p className="text-gray-300 text-lg max-w-3xl">
+                Transformando vidas através da tecnologia e inclusão. Acompanhe as métricas que mostram como o StellarBridge está construindo pontes para a liberdade profissional.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-cyan" />
+              <Select value={period} onValueChange={(value) => setPeriod(value as PeriodOption)}>
+                <SelectTrigger className="w-[200px] bg-dark-bg/50 border-cyan/30 text-gray-300">
+                  <SelectValue placeholder="Selecione o período" />
+                </SelectTrigger>
+                <SelectContent className="bg-dark-bg border-cyan/30">
+                  <SelectItem value="all">Todos os períodos</SelectItem>
+                  <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                  <SelectItem value="3m">Últimos 3 meses</SelectItem>
+                  <SelectItem value="6m">Últimos 6 meses</SelectItem>
+                  <SelectItem value="1y">Último ano</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       </div>
 

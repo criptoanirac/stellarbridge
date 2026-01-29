@@ -198,34 +198,64 @@ export const appRouter = router({
   // Social Impact routes
   socialImpact: router({
     // Get main metrics
-    getMetrics: publicProcedure.query(async () => {
-      return db.getSocialImpactMetrics();
-    }),
+    getMetrics: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getSocialImpactMetrics(input?.dateFrom, input?.dateTo);
+      }),
     
     // Get geographic distribution
-    getGeographicDistribution: publicProcedure.query(async () => {
-      return db.getGeographicDistribution();
-    }),
+    getGeographicDistribution: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getGeographicDistribution(input?.dateFrom, input?.dateTo);
+      }),
     
     // Get growth trend
-    getGrowthTrend: publicProcedure.query(async () => {
-      return db.getGrowthTrend();
-    }),
+    getGrowthTrend: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getGrowthTrend(input?.dateFrom, input?.dateTo);
+      }),
     
     // Get success stories
-    getSuccessStories: publicProcedure.query(async () => {
-      return db.getSuccessStories();
-    }),
+    getSuccessStories: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getSuccessStories(input?.dateFrom, input?.dateTo);
+      }),
     
     // Get top certifications
-    getTopCertifications: publicProcedure.query(async () => {
-      return db.getTopCertifications();
-    }),
+    getTopCertifications: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getTopCertifications(input?.dateFrom, input?.dateTo);
+      }),
     
     // Get active companies count
-    getActiveCompaniesCount: publicProcedure.query(async () => {
-      return db.getActiveCompaniesCount();
-    }),
+    getActiveCompaniesCount: publicProcedure
+      .input(z.object({
+        dateFrom: z.string().optional(),
+        dateTo: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getActiveCompaniesCount(input?.dateFrom, input?.dateTo);
+      }),
   }),
   
   // Job routes

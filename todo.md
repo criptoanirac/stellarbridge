@@ -83,3 +83,11 @@
 - [x] Adicionar gráficos: KPIs, mapas, tendências, histórias de sucesso
 - [x] Integrar dashboard ao menu de navegação
 - [x] Testar todas as métricas e visualizações
+
+## Filtro de Período no Dashboard de Impacto Social
+- [x] Atualizar endpoints tRPC para aceitar parâmetros de período (dateFrom, dateTo)
+- [x] Modificar funções do banco de dados para filtrar por data
+- [x] Adicionar componente Select para escolha de período na interface
+- [x] Implementar lógica de cálculo de datas (últimos 30 dias, 3 meses, 6 meses, 1 ano, todos)
+- [x] Integrar filtros com todas as queries (métricas, gráficos, histórias)
+- [x] Testar filtros e validar atualização dinâmica dos dados
