@@ -39,7 +39,7 @@ export default function Onboarding() {
           
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-gray-300 mb-6 font-light">
-            Sua ponte para o trabalho digno
+            Sua ponte para a liberdade
           </p>
           
           {/* Description */}
