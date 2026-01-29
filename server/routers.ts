@@ -195,6 +195,39 @@ export const appRouter = router({
     }),
   }),
   
+  // Social Impact routes
+  socialImpact: router({
+    // Get main metrics
+    getMetrics: publicProcedure.query(async () => {
+      return db.getSocialImpactMetrics();
+    }),
+    
+    // Get geographic distribution
+    getGeographicDistribution: publicProcedure.query(async () => {
+      return db.getGeographicDistribution();
+    }),
+    
+    // Get growth trend
+    getGrowthTrend: publicProcedure.query(async () => {
+      return db.getGrowthTrend();
+    }),
+    
+    // Get success stories
+    getSuccessStories: publicProcedure.query(async () => {
+      return db.getSuccessStories();
+    }),
+    
+    // Get top certifications
+    getTopCertifications: publicProcedure.query(async () => {
+      return db.getTopCertifications();
+    }),
+    
+    // Get active companies count
+    getActiveCompaniesCount: publicProcedure.query(async () => {
+      return db.getActiveCompaniesCount();
+    }),
+  }),
+  
   // Job routes
   job: router({
     // Create job posting

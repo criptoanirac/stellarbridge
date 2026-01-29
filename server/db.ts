@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch } from "../drizzle/schema";
+import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -236,4 +236,193 @@ export async function updateMatch(matchId: number, updates: Partial<InsertMatch>
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.update(matches).set(updates).where(eq(matches.id, matchId));
+}
+
+// Social Impact queries
+export async function getSocialImpactMetrics() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Total de candidatas capacitadas (com pelo menos 1 certificação)
+  const talentsWithCerts = await db
+    .selectDistinct({ talentId: talentCertifications.talentId })
+    .from(talentCertifications);
+  
+  // Total de vagas preenchidas (matches com status 'hired')
+  const hiredMatches = await db
+    .select()
+    .from(matches)
+    .where(eq(matches.status, "hired"));
+  
+  // Total de candidatas
+  const allTalents = await db.select().from(talents);
+  
+  // Candidatas com pelo menos 1 match
+  const talentsWithMatches = await db
+    .selectDistinct({ talentId: matches.talentId })
+    .from(matches);
+  
+  // Salário médio das vagas com contratação
+  const jobsWithHires = await db
+    .select({
+      salaryMin: jobPostings.salaryMin,
+      salaryMax: jobPostings.salaryMax,
+    })
+    .from(jobPostings)
+    .innerJoin(matches, eq(matches.jobId, jobPostings.id))
+    .where(eq(matches.status, "hired"));
+  
+  let avgSalary = 0;
+  if (jobsWithHires.length > 0) {
+    const totalSalary = jobsWithHires.reduce((sum, job) => {
+      // Convert decimal strings to numbers
+      const min = typeof job.salaryMin === 'string' ? parseFloat(job.salaryMin) : Number(job.salaryMin || 0);
+      const max = typeof job.salaryMax === 'string' ? parseFloat(job.salaryMax) : Number(job.salaryMax || 0);
+      return sum + (min + max) / 2;
+    }, 0);
+    avgSalary = totalSalary / jobsWithHires.length;
+  }
+  
+  return {
+    trainedTalents: talentsWithCerts.length,
+    jobsFilled: hiredMatches.length,
+    employabilityRate: allTalents.length > 0 
+      ? (talentsWithMatches.length / allTalents.length) * 100 
+      : 0,
+    avgSalary: Math.round(avgSalary),
+  };
+}
+
+export async function getGeographicDistribution() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Distribuição de talentos por localização
+  const talentsByLocation = await db
+    .select({
+      location: talents.location,
+      count: sql<number>`count(*)`,
+    })
+    .from(talents)
+    .groupBy(talents.location);
+  
+  // Distribuição de vagas por localização
+  const jobsByLocation = await db
+    .select({
+      location: jobPostings.location,
+      count: sql<number>`count(*)`,
+    })
+    .from(jobPostings)
+    .where(eq(jobPostings.status, "active"))
+    .groupBy(jobPostings.location);
+  
+  return {
+    talents: talentsByLocation,
+    jobs: jobsByLocation,
+  };
+}
+
+export async function getGrowthTrend() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Crescimento mensal de talentos, vagas e matches
+  const talentGrowth = await db
+    .select({
+      month: sql<string>`DATE_FORMAT(${talents.createdAt}, '%Y-%m') as month`,
+      count: sql<number>`count(*) as count`,
+    })
+    .from(talents)
+    .groupBy(sql`month`);
+  
+  const jobGrowth = await db
+    .select({
+      month: sql<string>`DATE_FORMAT(${jobPostings.createdAt}, '%Y-%m') as month`,
+      count: sql<number>`count(*) as count`,
+    })
+    .from(jobPostings)
+    .groupBy(sql`month`);
+  
+  const matchGrowth = await db
+    .select({
+      month: sql<string>`DATE_FORMAT(${matches.createdAt}, '%Y-%m') as month`,
+      count: sql<number>`count(*) as count`,
+    })
+    .from(matches)
+    .groupBy(sql`month`);
+  
+  // Sort results in JavaScript
+  talentGrowth.sort((a, b) => (a.month || '').localeCompare(b.month || ''));
+  jobGrowth.sort((a, b) => (a.month || '').localeCompare(b.month || ''));
+  matchGrowth.sort((a, b) => (a.month || '').localeCompare(b.month || ''));
+  
+  return {
+    talents: talentGrowth,
+    jobs: jobGrowth,
+    matches: matchGrowth,
+  };
+}
+
+export async function getSuccessStories() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const stories = await db
+    .select({
+      id: successStories.id,
+      testimonial: successStories.testimonial,
+      beforeRole: successStories.beforeRole,
+      afterRole: successStories.afterRole,
+      salaryIncrease: successStories.salaryIncrease,
+      imageUrl: successStories.imageUrl,
+      createdAt: successStories.createdAt,
+      talentPseudonym: talents.pseudonym,
+      companyName: companies.companyName,
+    })
+    .from(successStories)
+    .innerJoin(talents, eq(successStories.talentId, talents.id))
+    .innerJoin(companies, eq(successStories.companyId, companies.id))
+    .orderBy(desc(successStories.createdAt))
+    .limit(10);
+  
+  return stories;
+}
+
+export async function getTopCertifications() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Certificações mais populares entre candidatas contratadas
+  const topCerts = await db
+    .select({
+      certification: talentCertifications.certification,
+      count: sql<number>`count(*)`,
+    })
+    .from(talentCertifications)
+    .innerJoin(matches, eq(talentCertifications.talentId, matches.talentId))
+    .where(eq(matches.status, "hired"))
+    .groupBy(talentCertifications.certification)
+    .orderBy(desc(sql`count(*)`))
+    .limit(10);
+  
+  return topCerts;
+}
+
+export async function getActiveCompaniesCount() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const activeCompanies = await db
+    .selectDistinct({ companyId: jobPostings.companyId })
+    .from(jobPostings)
+    .where(eq(jobPostings.status, "active"));
+  
+  return activeCompanies.length;
+}
+
+export async function createSuccessStory(story: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(successStories).values(story);
+  return result;
 }

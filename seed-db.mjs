@@ -12,6 +12,7 @@ async function seed() {
   try {
     // Clear existing data (except users table)
     console.log("🗑️  Clearing existing data...");
+    await db.delete(schema.successStories);
     await db.delete(schema.notifications);
     await db.delete(schema.matches);
     await db.delete(schema.jobPostings);
@@ -32,6 +33,7 @@ async function seed() {
         yearsExperience: 8,
         industry: "Tecnologia",
         location: "São Paulo, SP",
+        birthDate: new Date('1990-05-15'),
         identityVerified: true,
       },
       {
@@ -42,6 +44,7 @@ async function seed() {
         yearsExperience: 5,
         industry: "Design",
         location: "Rio de Janeiro, RJ",
+        birthDate: new Date('1993-08-22'),
         identityVerified: true,
       },
       {
@@ -52,6 +55,7 @@ async function seed() {
         yearsExperience: 6,
         industry: "Tecnologia",
         location: "Belo Horizonte, MG",
+        birthDate: new Date('1992-03-10'),
         identityVerified: true,
       },
       {
@@ -258,10 +262,11 @@ async function seed() {
         title: "Desenvolvedora Full Stack Senior",
         description: "Buscamos desenvolvedora full stack com experiência em React e Node.js para liderar projetos inovadores.",
         sector: "Tecnologia",
-        level: "Senior",
+        experienceLevel: "senior",
         requiredSkills: JSON.stringify(["React", "Node.js", "TypeScript", "PostgreSQL"]),
-        salaryRange: "R$ 12.000 - R$ 18.000",
-        location: "São Paulo, SP / Remoto",
+        salaryMin: "12000",
+        salaryMax: "18000",
+        location: "São Paulo, SP",
         status: "active",
       },
       {
@@ -269,10 +274,11 @@ async function seed() {
         title: "Engenheira de Software",
         description: "Procuramos engenheira de software para trabalhar com arquitetura de microservices e cloud.",
         sector: "Tecnologia",
-        level: "Senior",
+        experienceLevel: "senior",
         requiredSkills: JSON.stringify(["Java", "Kubernetes", "AWS", "Microservices"]),
-        salaryRange: "R$ 15.000 - R$ 22.000",
-        location: "São Paulo, SP / Remoto",
+        salaryMin: "15000",
+        salaryMax: "22000",
+        location: "São Paulo, SP",
         status: "active",
       },
       {
@@ -280,10 +286,11 @@ async function seed() {
         title: "Desenvolvedora Mobile",
         description: "Desenvolvedora mobile para criar aplicativos incríveis com React Native.",
         sector: "Tecnologia",
-        level: "Pleno",
+        experienceLevel: "mid",
         requiredSkills: JSON.stringify(["React Native", "JavaScript", "iOS", "Android"]),
-        salaryRange: "R$ 8.000 - R$ 12.000",
-        location: "Rio de Janeiro, RJ / Remoto",
+        salaryMin: "8000",
+        salaryMax: "12000",
+        location: "Rio de Janeiro, RJ",
         status: "active",
       },
       {
@@ -291,10 +298,11 @@ async function seed() {
         title: "Designer UI/UX",
         description: "Designer UI/UX para criar experiências digitais memoráveis e inclusivas.",
         sector: "Design",
-        level: "Pleno",
+        experienceLevel: "mid",
         requiredSkills: JSON.stringify(["Figma", "UI Design", "UX Research", "Prototipagem"]),
-        salaryRange: "R$ 7.000 - R$ 11.000",
-        location: "Belo Horizonte, MG / Remoto",
+        salaryMin: "7000",
+        salaryMax: "11000",
+        location: "Belo Horizonte, MG",
         status: "active",
       },
       {
@@ -302,10 +310,11 @@ async function seed() {
         title: "Analista de Dados Senior",
         description: "Analista de dados para trabalhar com grandes volumes de dados e machine learning.",
         sector: "Tecnologia",
-        level: "Senior",
+        experienceLevel: "senior",
         requiredSkills: JSON.stringify(["Python", "Pandas", "Machine Learning", "SQL"]),
-        salaryRange: "R$ 10.000 - R$ 16.000",
-        location: "Curitiba, PR / Remoto",
+        salaryMin: "10000",
+        salaryMax: "16000",
+        location: "Curitiba, PR",
         status: "active",
       },
       {
@@ -313,10 +322,11 @@ async function seed() {
         title: "Product Manager",
         description: "Product Manager para liderar o desenvolvimento de produtos digitais inovadores.",
         sector: "Produto",
-        level: "Senior",
+        experienceLevel: "senior",
         requiredSkills: JSON.stringify(["Product Strategy", "User Stories", "Analytics", "A/B Testing"]),
-        salaryRange: "R$ 12.000 - R$ 18.000",
-        location: "Rio de Janeiro, RJ / Remoto",
+        salaryMin: "12000",
+        salaryMax: "18000",
+        location: "Rio de Janeiro, RJ",
         status: "active",
       },
       {
@@ -324,10 +334,11 @@ async function seed() {
         title: "Gerente de Projetos",
         description: "Gerente de projetos certificada PMP para liderar equipes ágeis.",
         sector: "Gestão",
-        level: "Senior",
+        experienceLevel: "senior",
         requiredSkills: JSON.stringify(["Scrum", "Kanban", "Jira", "Gestão de Equipes"]),
-        salaryRange: "R$ 11.000 - R$ 17.000",
-        location: "São Paulo, SP / Híbrido",
+        salaryMin: "11000",
+        salaryMax: "17000",
+        location: "São Paulo, SP",
         status: "active",
       },
     ]);
@@ -354,7 +365,7 @@ async function seed() {
         jobId: 4,
         compatibilityScore: 92,
         matchedSkills: JSON.stringify(["Figma", "UI Design", "UX Research"]),
-        status: "interested",
+        status: "hired",
       },
       {
         talentId: 3,
@@ -375,14 +386,14 @@ async function seed() {
         jobId: 3,
         compatibilityScore: 90,
         matchedSkills: JSON.stringify(["React Native", "iOS", "Android"]),
-        status: "pending",
+        status: "hired",
       },
       {
         talentId: 6,
         jobId: 2,
         compatibilityScore: 93,
         matchedSkills: JSON.stringify(["Java", "Kubernetes", "AWS"]),
-        status: "pending",
+        status: "hired",
       },
       {
         talentId: 7,
@@ -393,6 +404,35 @@ async function seed() {
       },
     ]);
 
+    // Insert success stories
+    console.log("🌟 Inserting success stories...");
+    await db.insert(schema.successStories).values([
+      {
+        talentId: 2,
+        companyId: 3,
+        testimonial: "O StellarBridge mudou minha vida profissional. Após anos tentando entrar no mercado de design, finalmente consegui uma oportunidade que valoriza minhas habilidades. Hoje trabalho em projetos incríveis e ganho 40% a mais do que no meu emprego anterior.",
+        beforeRole: "Designer Freelancer",
+        afterRole: "Designer UI/UX Pleno",
+        salaryIncrease: "40.50",
+      },
+      {
+        talentId: 5,
+        companyId: 2,
+        testimonial: "A plataforma me conectou com uma empresa que realmente acredita em diversidade. O processo foi transparente e justo. Hoje desenvolvo aplicativos que impactam milhões de pessoas e me sinto realizada profissionalmente.",
+        beforeRole: "Desenvolvedora Júnior",
+        afterRole: "Desenvolvedora Mobile Pleno",
+        salaryIncrease: "65.00",
+      },
+      {
+        talentId: 6,
+        companyId: 1,
+        testimonial: "Graças ao StellarBridge, consegui minha primeira oportunidade em uma grande empresa de tecnologia. O recrutamento blind eliminou os viéses e permitiu que minhas habilidades falassem por si. Hoje lidero projetos de arquitetura de sistemas.",
+        beforeRole: "Engenheira de Software Júnior",
+        afterRole: "Engenheira de Software Sênior",
+        salaryIncrease: "85.00",
+      },
+    ]);
+
     console.log("✅ Database seeded successfully!");
     console.log("\n📊 Summary:");
     console.log("- 7 talents created");
@@ -400,8 +440,9 @@ async function seed() {
     console.log("- 7 education records added");
     console.log("- 7 certifications added");
     console.log("- 4 companies created");
-    console.log("- 7 job postings created");
-    console.log("- 8 matches created");
+    console.log("- 7 job postings created (with salary ranges)");
+    console.log("- 8 matches created (3 hired)");
+    console.log("- 3 success stories added");
     
     process.exit(0);
   } catch (error) {

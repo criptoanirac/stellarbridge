@@ -73,7 +73,7 @@ export default function Onboarding() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-6 w-full max-w-md mb-20">
+        <div className="flex flex-col md:flex-row gap-6 w-full max-w-2xl mb-20">
           <button
             onClick={() => setLocation("/talent-signup")}
             className="btn-cyber flex-1 text-center"
@@ -86,6 +86,13 @@ export default function Onboarding() {
             className="btn-cyber-outline flex-1 text-center"
           >
             Sou Empresa
+          </button>
+          
+          <button
+            onClick={() => setLocation("/impacto-social")}
+            className="flex-1 text-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
+          >
+            Ver Impacto
           </button>
         </div>
 

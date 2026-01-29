@@ -11,7 +11,8 @@ import EmployerDashboard from "./pages/EmployerDashboard";
 import PostJob from "./pages/PostJob";
 import ManageJobs from "./pages/ManageJobs";
 import TalentBank from "./pages/TalentBank";
-import Matchmaking from "./pages/Matchmaking";
+import Matchmaking from "@/pages/Matchmaking";
+import SocialImpact from "@/pages/SocialImpact";
 import TalentProfile from "./pages/TalentProfile";
 import TalentSignup from "./pages/TalentSignup";
 import TalentDashboard from "./pages/TalentDashboard";
@@ -29,7 +30,8 @@ function Router() {
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/manage-jobs"} component={ManageJobs} />
       <Route path={"/talent-bank"} component={TalentBank} />
-      <Route path={"/matchmaking/:talentId"} component={Matchmaking} />
+        <Route path="/matchmaking" component={Matchmaking} />
+        <Route path="/impacto-social" component={SocialImpact} />
       <Route path={"/talent-profile/:talentId"} component={TalentProfile} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

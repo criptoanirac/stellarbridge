@@ -71,3 +71,15 @@
 - [x] Ajustar espaçamento entre botões e texto descritivo
 - [x] Aumentar margem inferior dos botões
 - [x] Testar responsividade em diferentes tamanhos de tela
+
+## Dashboard de Impacto Social
+- [x] Atualizar schema: adicionar campos salaryMin, salaryMax, location em jobPostings
+- [x] Atualizar schema: adicionar campo status em matches
+- [x] Criar tabela successStories para depoimentos
+- [x] Adicionar campo birthDate em talents (opcional)
+- [x] Criar endpoints tRPC para métricas de impacto social
+- [x] Atualizar seed-db.mjs com dados de salário, localização e histórias de sucesso
+- [x] Implementar página SocialImpact.tsx com visualizações
+- [x] Adicionar gráficos: KPIs, mapas, tendências, histórias de sucesso
+- [x] Integrar dashboard ao menu de navegação
+- [x] Testar todas as métricas e visualizações

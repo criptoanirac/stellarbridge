@@ -15,6 +15,13 @@
       "when": 1769616912509,
       "tag": "0001_calm_logan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769706402889,
+      "tag": "0002_complete_loki",
+      "breakpoints": true
     }
   ]
 }

@@ -39,6 +39,7 @@ export const talents = mysqlTable("talents", {
   yearsExperience: varchar("yearsExperience", { length: 50 }),
   industry: varchar("industry", { length: 255 }),
   location: varchar("location", { length: 255 }),
+  birthDate: timestamp("birthDate"),
   portfolioUrl: varchar("portfolioUrl", { length: 500 }),
   githubUrl: varchar("githubUrl", { length: 500 }),
   linkedinUrl: varchar("linkedinUrl", { length: 500 }),
@@ -180,6 +181,25 @@ export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 
 /**
+ * Success Stories
+ * Stores testimonials from hired talents
+ */
+export const successStories = mysqlTable("successStories", {
+  id: int("id").autoincrement().primaryKey(),
+  talentId: int("talentId").notNull(),
+  companyId: int("companyId").notNull(),
+  testimonial: text("testimonial").notNull(),
+  beforeRole: varchar("beforeRole", { length: 255 }),
+  afterRole: varchar("afterRole", { length: 255 }),
+  salaryIncrease: decimal("salaryIncrease", { precision: 5, scale: 2 }),
+  imageUrl: varchar("imageUrl", { length: 500 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SuccessStory = typeof successStories.$inferSelect;
+export type InsertSuccessStory = typeof successStories.$inferInsert;
+
+/**
  * Relations
  */
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -257,5 +277,16 @@ export const talentCertificationsRelations = relations(talentCertifications, ({ 
   talent: one(talents, {
     fields: [talentCertifications.talentId],
     references: [talents.id],
+  }),
+}));
+
+export const successStoriesRelations = relations(successStories, ({ one }) => ({
+  talent: one(talents, {
+    fields: [successStories.talentId],
+    references: [talents.id],
+  }),
+  company: one(companies, {
+    fields: [successStories.companyId],
+    references: [companies.id],
   }),
 }));
