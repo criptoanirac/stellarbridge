@@ -44,3 +44,9 @@
 - [x] Adicionar mensagens de erro abaixo de cada campo
 - [x] Adicionar botão de preenchimento automático com dados fictícios
 - [x] Testar validação em todos os passos do formulário
+
+## Correção de Erro de Insert na Tabela Talents
+- [x] Investigar erro de insert na tabela talents
+- [x] Verificar schema da tabela e campos obrigatórios
+- [x] Corrigir mutation createProfile no backend
+- [x] Testar criação de perfil após correção

@@ -1,0 +1,27 @@
+{
+  "query": "SELECT * FROM talents WHERE userId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2yYvD4MQZGR4c9t.ceaba074e798 --database QZCMuQ2r5owQBfXcSfmpvd --execute SELECT * FROM talents WHERE userId = 1;",
+  "rows": [
+    {
+      "id": "30029",
+      "userId": "1",
+      "pseudonym": "Talent-X-001",
+      "bio": "Desenvolvedora Full Stack apaixonada por criar soluções inovadoras e acessíveis.",
+      "currentRole": "Desenvolvedora Full Stack Senior",
+      "yearsExperience": "8",
+      "industry": "Tecnologia",
+      "location": "São Paulo, SP",
+      "portfolioUrl": "NULL",
+      "githubUrl": "NULL",
+      "linkedinUrl": "NULL",
+      "identityVerified": "1",
+      "verificationMethod": "NULL",
+      "createdAt": "2026-01-28 23:34:45",
+      "updatedAt": "2026-01-28 23:34:45"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tpseudonym\tbio\tcurrentRole\tyearsExperience\tindustry\tlocation\tportfolioUrl\tgithubUrl\tlinkedinUrl\tidentityVerified\tverificationMethod\tcreatedAt\tupdatedAt\n30029\t1\tTalent-X-001\tDesenvolvedora Full Stack apaixonada por criar soluções inovadoras e acessíveis.\tDesenvolvedora Full Stack Senior\t8\tTecnologia\tSão Paulo, SP\tNULL\tNULL\tNULL\t1\tNULL\t2026-01-28 23:34:45\t2026-01-28 23:34:45\n",
+  "stderr": "",
+  "execution_time_ms": 199
+}

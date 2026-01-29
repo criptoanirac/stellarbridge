@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Upload, Plus, X, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -13,6 +13,19 @@ import { toast } from "sonner";
  */
 export default function TalentSignup() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  
+  // Check if profile already exists
+  const { data: existingProfile, isLoading: isLoadingProfile } = trpc.talent.getProfile.useQuery(undefined, {
+    enabled: !!user,
+  });
+  
+  useEffect(() => {
+    if (existingProfile) {
+      toast.info("Você já possui um perfil cadastrado!");
+      setLocation("/talent-dashboard");
+    }
+  }, [existingProfile, setLocation]);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -168,7 +181,6 @@ export default function TalentSignup() {
     toast.success("✨ Dados fictícios preenchidos automaticamente!");
   };
 
-  const { user } = useAuth();
   const createProfileMutation = trpc.talent.createProfile.useMutation();
   const addSkillMutation = trpc.talent.addSkill.useMutation();
   const addEducationMutation = trpc.talent.addEducation.useMutation();
