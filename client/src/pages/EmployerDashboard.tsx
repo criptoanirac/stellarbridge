@@ -204,7 +204,7 @@ export default function EmployerDashboard() {
                 {/* Action Button */}
                 <button
                   className="btn-cyber-outline w-full text-sm py-2"
-                  onClick={() => alert("Visualizar matches em desenvolvimento")}
+                  onClick={() => setLocation("/bridge")}
                 >
                   Ver Candidatas
                 </button>

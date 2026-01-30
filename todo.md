@@ -178,3 +178,8 @@
 - [x] Remover botão "Explorar Talentos" da página inicial (Onboarding)
 - [x] Criar modal de detalhes da candidata na página Bridge
 - [x] Popular modal com informações fictícias completas (educação, certificações, experiência)
+
+## Integração Bridge com Dashboard Empresa
+- [x] Verificar se existe página EmployerDashboard
+- [x] Adicionar link/botão para Bridge no dashboard da empresa
+- [x] Testar carregamento de dados fictícios na página Bridge
