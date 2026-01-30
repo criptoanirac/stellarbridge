@@ -51,6 +51,12 @@ export const appRouter = router({
         linkedinUrl: z.string().url().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Check if profile already exists
+        const existing = await db.getTalentByUserId(ctx.user.id);
+        if (existing) {
+          throw new Error("Você já possui um perfil cadastrado");
+        }
+        
         const talent = await db.createTalent({
           userId: ctx.user.id,
           ...input,

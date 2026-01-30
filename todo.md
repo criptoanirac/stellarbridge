@@ -153,3 +153,9 @@
 - [x] Investigar endpoint talent.createProfile no routers.ts
 - [x] Corrigir retorno de insertId
 - [x] Testar criação completa de perfil com skills e education
+
+## Correção de Erro - Inserção no Banco
+- [x] Investigar logs do servidor para identificar causa raiz
+- [x] Verificar se userId já existe na tabela talents
+- [x] Corrigir lógica de inserção ou adicionar verificação de duplicatas
+- [x] Testar criação de perfil completa
