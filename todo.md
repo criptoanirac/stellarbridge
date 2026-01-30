@@ -123,3 +123,9 @@
 
 ## Navegação - Botão Home
 - [x] Adicionar botão "Voltar para Home" no header da página SocialImpact
+
+## Correção de Autenticação - Tela Inicial
+- [x] Investigar fluxo de autenticação na página Home
+- [x] Verificar se botões "Sou Talento" e "Sou Empresa" estão funcionando
+- [x] Adicionar instruções claras de login ou corrigir navegação
+- [x] Testar fluxo completo de autenticação
