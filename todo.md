@@ -183,3 +183,6 @@
 - [x] Verificar se existe página EmployerDashboard
 - [x] Adicionar link/botão para Bridge no dashboard da empresa
 - [x] Testar carregamento de dados fictícios na página Bridge
+
+## Melhoria de Navegação - Bridge
+- [x] Substituir botão "Home" por "Voltar" na página Bridge

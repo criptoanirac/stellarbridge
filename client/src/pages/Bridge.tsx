@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Search, MapPin, Briefcase, Star, Heart, Home, Eye, GraduationCap, Award, Calendar } from "lucide-react";
+import { Search, MapPin, Briefcase, Star, Heart, ArrowLeft, Eye, GraduationCap, Award, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -75,12 +75,10 @@ export default function Bridge() {
                 Conectando talentos e oportunidades
               </span>
             </div>
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Button>
-            </Link>
+            <Button variant="outline" size="sm" onClick={() => window.history.back()}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
           </div>
         </div>
       </header>
