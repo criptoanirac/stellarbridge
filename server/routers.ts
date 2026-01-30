@@ -175,11 +175,11 @@ export const appRouter = router({
         location: z.string().optional(),
         minExperience: z.string().optional(),
         industry: z.string().optional(),
-        limit: z.number().default(20),
-        offset: z.number().default(0),
-      }))
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
       .query(async ({ input }) => {
-        return db.listTalents(input);
+        return db.listTalents(input || {});
       }),
   }),
   

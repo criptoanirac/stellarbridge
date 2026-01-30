@@ -27,9 +27,9 @@ export default function Bridge() {
 
   // Fetch talents with filters
   const { data: talents, isLoading } = trpc.talent.list.useQuery({
-    location: locationFilter || undefined,
-    minExperience: experienceFilter || undefined,
-    industry: industryFilter || undefined,
+    location: locationFilter && locationFilter !== "all" ? locationFilter : undefined,
+    minExperience: experienceFilter && experienceFilter !== "all" ? experienceFilter : undefined,
+    industry: industryFilter && industryFilter !== "all" ? industryFilter : undefined,
     limit: 50,
   });
 
@@ -100,7 +100,7 @@ export default function Bridge() {
                 <SelectValue placeholder="Localização" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as localizações</SelectItem>
+                <SelectItem value="all">Todas as localizações</SelectItem>
                 <SelectItem value="São Paulo">São Paulo</SelectItem>
                 <SelectItem value="Rio de Janeiro">Rio de Janeiro</SelectItem>
                 <SelectItem value="Belo Horizonte">Belo Horizonte</SelectItem>
@@ -118,7 +118,7 @@ export default function Bridge() {
                 <SelectValue placeholder="Experiência" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Qualquer experiência</SelectItem>
+                <SelectItem value="all">Qualquer experiência</SelectItem>
                 <SelectItem value="0-1">0-1 anos</SelectItem>
                 <SelectItem value="1-3">1-3 anos</SelectItem>
                 <SelectItem value="3-5">3-5 anos</SelectItem>
@@ -132,7 +132,7 @@ export default function Bridge() {
                 <SelectValue placeholder="Indústria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as indústrias</SelectItem>
+                <SelectItem value="all">Todas as indústrias</SelectItem>
                 <SelectItem value="Tecnologia">Tecnologia</SelectItem>
                 <SelectItem value="Finanças">Finanças</SelectItem>
                 <SelectItem value="Saúde">Saúde</SelectItem>

@@ -28,7 +28,7 @@ async function seed() {
 
     // Insert talents
     console.log("👩‍💻 Inserting talents...");
-    const talents = await db.insert(schema.talents).values([
+    const talentsResult = await db.insert(schema.talents).values([
       {
         userId: 1,
         pseudonym: "Talent-X-001",
@@ -108,80 +108,84 @@ async function seed() {
       },
     ]);
 
+    // Get inserted talent IDs
+    const insertedTalents = await db.select({ id: schema.talents.id }).from(schema.talents).orderBy(schema.talents.id).limit(7);
+    const talentIds = insertedTalents.map(t => t.id);
+    
     // Insert talent skills
     console.log("💡 Inserting talent skills...");
     await db.insert(schema.talentSkills).values([
-      { talentId: 1, skill: "React" },
-      { talentId: 1, skill: "Node.js" },
-      { talentId: 1, skill: "TypeScript" },
-      { talentId: 1, skill: "PostgreSQL" },
-      { talentId: 2, skill: "Figma" },
-      { talentId: 2, skill: "Adobe XD" },
-      { talentId: 2, skill: "UI Design" },
-      { talentId: 2, skill: "UX Research" },
-      { talentId: 3, skill: "Python" },
-      { talentId: 3, skill: "Pandas" },
-      { talentId: 3, skill: "Machine Learning" },
-      { talentId: 3, skill: "SQL" },
-      { talentId: 4, skill: "Scrum" },
-      { talentId: 4, skill: "Kanban" },
-      { talentId: 4, skill: "Jira" },
-      { talentId: 4, skill: "Gestão de Equipes" },
-      { talentId: 5, skill: "React Native" },
-      { talentId: 5, skill: "Flutter" },
-      { talentId: 5, skill: "iOS" },
-      { talentId: 5, skill: "Android" },
-      { talentId: 6, skill: "Java" },
-      { talentId: 6, skill: "Kubernetes" },
-      { talentId: 6, skill: "Microservices" },
-      { talentId: 6, skill: "AWS" },
-      { talentId: 7, skill: "Product Strategy" },
-      { talentId: 7, skill: "User Stories" },
-      { talentId: 7, skill: "Analytics" },
-      { talentId: 7, skill: "A/B Testing" },
+      { talentId: talentIds[0], skill: "React" },
+      { talentId: talentIds[0], skill: "Node.js" },
+      { talentId: talentIds[0], skill: "TypeScript" },
+      { talentId: talentIds[0], skill: "PostgreSQL" },
+      { talentId: talentIds[1], skill: "Figma" },
+      { talentId: talentIds[1], skill: "Adobe XD" },
+      { talentId: talentIds[1], skill: "UI Design" },
+      { talentId: talentIds[1], skill: "UX Research" },
+      { talentId: talentIds[2], skill: "Python" },
+      { talentId: talentIds[2], skill: "Pandas" },
+      { talentId: talentIds[2], skill: "Machine Learning" },
+      { talentId: talentIds[2], skill: "SQL" },
+      { talentId: talentIds[3], skill: "Scrum" },
+      { talentId: talentIds[3], skill: "Kanban" },
+      { talentId: talentIds[3], skill: "Jira" },
+      { talentId: talentIds[3], skill: "Gestão de Equipes" },
+      { talentId: talentIds[4], skill: "React Native" },
+      { talentId: talentIds[4], skill: "Flutter" },
+      { talentId: talentIds[4], skill: "iOS" },
+      { talentId: talentIds[4], skill: "Android" },
+      { talentId: talentIds[5], skill: "Java" },
+      { talentId: talentIds[5], skill: "Kubernetes" },
+      { talentId: talentIds[5], skill: "Microservices" },
+      { talentId: talentIds[5], skill: "AWS" },
+      { talentId: talentIds[6], skill: "Product Strategy" },
+      { talentId: talentIds[6], skill: "User Stories" },
+      { talentId: talentIds[6], skill: "Analytics" },
+      { talentId: talentIds[6], skill: "A/B Testing" },
     ]);
 
     // Insert talent education
     console.log("🎓 Inserting talent education...");
     await db.insert(schema.talentEducation).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         institution: "Universidade de São Paulo",
         course: "Bacharelado em Ciência da Computação",
         completionYear: 2016,
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         institution: "PUC-Rio",
         course: "Bacharelado em Design",
         completionYear: 2019,
       },
       {
-        talentId: 3,
+        talentId: talentIds[2],
         institution: "UFMG",
         course: "Bacharelado em Estatística",
         completionYear: 2018,
       },
       {
-        talentId: 4,
+        talentId: talentIds[3],
         institution: "FGV",
         course: "MBA em Gestão de Projetos",
         completionYear: 2015,
       },
       {
-        talentId: 5,
+        talentId: talentIds[4],
         institution: "UFRGS",
         course: "Bacharelado em Sistemas de Informação",
         completionYear: 2020,
       },
       {
-        talentId: 6,
+        talentId: talentIds[5],
         institution: "UnB",
         course: "Bacharelado em Engenharia de Software",
         completionYear: 2017,
       },
       {
-        talentId: 7,
+        talentId: talentIds[6],
         institution: "Insper",
         course: "Bacharelado em Administração",
         completionYear: 2018,
@@ -192,31 +196,31 @@ async function seed() {
     console.log("🏆 Inserting talent certifications...");
     await db.insert(schema.talentCertifications).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         certification: "AWS Certified Solutions Architect",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         certification: "Google UX Design Professional Certificate",
       },
       {
-        talentId: 3,
+        talentId: talentIds[2],
         certification: "Google Data Analytics Professional Certificate",
       },
       {
-        talentId: 4,
+        talentId: talentIds[3],
         certification: "PMP - Project Management Professional",
       },
       {
-        talentId: 5,
+        talentId: talentIds[4],
         certification: "Google Associate Android Developer",
       },
       {
-        talentId: 6,
+        talentId: talentIds[5],
         certification: "Certified Kubernetes Administrator (CKA)",
       },
       {
-        talentId: 7,
+        talentId: talentIds[6],
         certification: "Certified Scrum Product Owner (CSPO)",
       },
     ]);
@@ -355,56 +359,56 @@ async function seed() {
     console.log("🤝 Inserting matches...");
     await db.insert(schema.matches).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         jobId: 1,
         compatibilityScore: 95,
         matchedSkills: JSON.stringify(["React", "Node.js", "TypeScript"]),
         status: "pending",
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         jobId: 2,
         compatibilityScore: 78,
         matchedSkills: JSON.stringify(["React", "Node.js"]),
         status: "pending",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         jobId: 4,
         compatibilityScore: 92,
         matchedSkills: JSON.stringify(["Figma", "UI Design", "UX Research"]),
         status: "hired",
       },
       {
-        talentId: 3,
+        talentId: talentIds[2],
         jobId: 5,
         compatibilityScore: 88,
         matchedSkills: JSON.stringify(["Python", "Pandas", "SQL"]),
         status: "pending",
       },
       {
-        talentId: 4,
+        talentId: talentIds[3],
         jobId: 7,
         compatibilityScore: 85,
         matchedSkills: JSON.stringify(["Scrum", "Kanban", "Jira"]),
         status: "pending",
       },
       {
-        talentId: 5,
+        talentId: talentIds[4],
         jobId: 3,
         compatibilityScore: 90,
         matchedSkills: JSON.stringify(["React Native", "iOS", "Android"]),
         status: "hired",
       },
       {
-        talentId: 6,
+        talentId: talentIds[5],
         jobId: 2,
         compatibilityScore: 93,
         matchedSkills: JSON.stringify(["Java", "Kubernetes", "AWS"]),
         status: "hired",
       },
       {
-        talentId: 7,
+        talentId: talentIds[6],
         jobId: 6,
         compatibilityScore: 87,
         matchedSkills: JSON.stringify(["Product Strategy", "Analytics"]),
@@ -416,7 +420,7 @@ async function seed() {
     console.log("🌟 Inserting success stories...");
     await db.insert(schema.successStories).values([
       {
-        talentId: 2,
+        talentId: talentIds[1],
         companyId: 3,
         testimonial: "O StellarBridge mudou minha vida profissional. Após anos tentando entrar no mercado de design, finalmente consegui uma oportunidade que valoriza minhas habilidades. Hoje trabalho em projetos incríveis e ganho 40% a mais do que no meu emprego anterior.",
         beforeRole: "Designer Freelancer",
@@ -424,7 +428,7 @@ async function seed() {
         salaryIncrease: "40.50",
       },
       {
-        talentId: 5,
+        talentId: talentIds[4],
         companyId: 2,
         testimonial: "A plataforma me conectou com uma empresa que realmente acredita em diversidade. O processo foi transparente e justo. Hoje desenvolvo aplicativos que impactam milhões de pessoas e me sinto realizada profissionalmente.",
         beforeRole: "Desenvolvedora Júnior",
@@ -432,7 +436,7 @@ async function seed() {
         salaryIncrease: "65.00",
       },
       {
-        talentId: 6,
+        talentId: talentIds[5],
         companyId: 1,
         testimonial: "Graças ao StellarBridge, consegui minha primeira oportunidade em uma grande empresa de tecnologia. O recrutamento blind eliminou os viéses e permitiu que minhas habilidades falassem por si. Hoje lidero projetos de arquitetura de sistemas.",
         beforeRole: "Engenheira de Software Júnior",
@@ -445,14 +449,14 @@ async function seed() {
     console.log("🎯 Inserting career plans...");
     await db.insert(schema.careerPlans).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         targetRole: "Tech Lead",
         targetIndustry: "Tecnologia",
         targetSalary: "15000",
         deadline: new Date('2026-12-31'),
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         targetRole: "Head of Design",
         targetIndustry: "Design",
         targetSalary: "12000",
@@ -464,7 +468,7 @@ async function seed() {
     console.log("🏆 Inserting achievements...");
     await db.insert(schema.achievements).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         badgeType: "first_certification",
         badgeName: "Primeira Certificação",
         badgeDescription: "Parabéns por completar sua primeira certificação!",
@@ -472,7 +476,7 @@ async function seed() {
         xpAwarded: 50,
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         badgeType: "level_3",
         badgeName: "Nível 3 Alcançado",
         badgeDescription: "Você alcançou o nível 3!",
@@ -480,7 +484,7 @@ async function seed() {
         xpAwarded: 0,
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         badgeType: "first_certification",
         badgeName: "Primeira Certificação",
         badgeDescription: "Parabéns por completar sua primeira certificação!",
@@ -493,43 +497,43 @@ async function seed() {
     console.log("📈 Inserting talent progress...");
     await db.insert(schema.talentProgress).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         eventType: "profile_completed",
         xpGained: 50,
         description: "Perfil completo criado",
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         eventType: "certification_added",
         xpGained: 100,
         description: "Certificação adicionada",
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         eventType: "skill_verified",
         xpGained: 50,
         description: "Habilidade verificada",
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         eventType: "career_plan_created",
         xpGained: 50,
         description: "Plano de carreira definido",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         eventType: "profile_completed",
         xpGained: 50,
         description: "Perfil completo criado",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         eventType: "certification_added",
         xpGained: 100,
         description: "Certificação adicionada",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         eventType: "career_plan_created",
         xpGained: 30,
         description: "Plano de carreira definido",
@@ -540,7 +544,7 @@ async function seed() {
     console.log("📚 Inserting course recommendations...");
     await db.insert(schema.courseRecommendations).values([
       {
-        talentId: 1,
+        talentId: talentIds[0],
         courseName: "Liderança Técnica e Gestão de Times",
         provider: "Alura",
         category: "Leadership",
@@ -552,7 +556,7 @@ async function seed() {
         status: "recommended",
       },
       {
-        talentId: 1,
+        talentId: talentIds[0],
         courseName: "Arquitetura de Microsserviços",
         provider: "Udemy",
         category: "Architecture",
@@ -564,7 +568,7 @@ async function seed() {
         status: "in_progress",
       },
       {
-        talentId: 2,
+        talentId: talentIds[1],
         courseName: "Design System Avançado",
         provider: "Interaction Design Foundation",
         category: "Design",

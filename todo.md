@@ -167,3 +167,9 @@
 - [x] Implementar filtros de busca (skills, localização, experiência)
 - [x] Adicionar funcionalidade de match/interesse
 - [x] Testar listagem e filtros
+
+## Correção - SelectItem com valor vazio
+- [x] Substituir value="" por value="all" nos SelectItem da página Bridge
+- [x] Verificar se endpoint talent.list está funcionando corretamente
+- [x] Garantir que talentos sejam carregados na página Bridge
+- [x] Corrigir seed para associar skills aos talentos corretamente
