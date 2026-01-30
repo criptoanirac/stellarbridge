@@ -208,3 +208,10 @@
 - [x] Capturar screenshot do Dashboard da Empresa
 - [x] Capturar screenshot do Dashboard de Impacto Social
 - [x] Atualizar README.md com seção de screenshots
+
+## Landing Page
+- [x] Criar página Landing.tsx com seções: Hero, Funcionalidades, Impacto, Depoimentos, CTA
+- [x] Adicionar animações e efeitos visuais
+- [x] Garantir responsividade mobile
+- [x] Adicionar rota /landing no App.tsx
+- [x] Testar em diferentes resoluções

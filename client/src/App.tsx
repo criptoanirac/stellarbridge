@@ -19,12 +19,14 @@ import TalentDashboard from "./pages/TalentDashboard";
 import TrainingHub from "./pages/TrainingHub";
 import ProfessionalDevelopment from "./pages/ProfessionalDevelopment";
 import Bridge from "./pages/Bridge";
+import Landing from "./pages/Landing";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Onboarding} />
+      <Route path={"/landing"} component={Landing} />
       <Route path={"/talent-signup"} component={TalentSignup} />
       <Route path={"/talent-dashboard"} component={TalentDashboard} />
       <Route path={"/training-hub"} component={TrainingHub} />
