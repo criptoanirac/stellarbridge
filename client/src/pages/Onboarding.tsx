@@ -85,7 +85,7 @@ export default function Onboarding() {
           {/* Dev Quick Login Buttons */}
           <div className="flex flex-col md:flex-row gap-6">
             <a
-              href="/api/dev-login?redirect=/talent-signup"
+              href="/api/dev-login?redirect=/talent-dashboard"
               className="btn-cyber flex-1 text-center"
             >
               ⚡ Login Rápido - Talento

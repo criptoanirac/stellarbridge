@@ -38,11 +38,49 @@ export default function TalentDashboard() {
   if (!profile) {
     return (
       <div className="min-h-screen grid-bg flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl text-white mb-4">Perfil não encontrado</h2>
-          <Button onClick={() => setLocation("/talent-signup")} className="bg-gradient-to-r from-cyan-500 to-magenta-500">
-            Criar Perfil
-          </Button>
+        <div className="max-w-md w-full mx-auto p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">Bem-vinda à StellarBridge!</h2>
+            <p className="text-slate-400">Escolha uma opção para continuar</p>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="p-6 bg-slate-900/50 border border-cyan-500/20 rounded-lg">
+              <h3 className="text-xl font-bold text-white mb-2">Já tenho cadastro</h3>
+              <p className="text-slate-400 text-sm mb-4">Acesse seu perfil existente</p>
+              <Button 
+                onClick={() => {
+                  toast.info("Você já está logada! Mas seu perfil ainda não foi criado.");
+                  setLocation("/talent-signup");
+                }} 
+                variant="outline"
+                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+              >
+                Acessar Perfil
+              </Button>
+            </div>
+            
+            <div className="p-6 bg-slate-900/50 border border-magenta-500/20 rounded-lg">
+              <h3 className="text-xl font-bold text-white mb-2">Novo por aqui?</h3>
+              <p className="text-slate-400 text-sm mb-4">Crie seu perfil e comece a receber oportunidades</p>
+              <Button 
+                onClick={() => setLocation("/talent-signup")} 
+                className="w-full bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600"
+              >
+                Criar Perfil
+              </Button>
+            </div>
+          </div>
+          
+          <div className="mt-6 text-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => setLocation("/")} 
+              className="text-slate-400 hover:text-white"
+            >
+              ← Voltar para Início
+            </Button>
+          </div>
         </div>
       </div>
     );

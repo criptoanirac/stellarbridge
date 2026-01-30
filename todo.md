@@ -232,3 +232,22 @@
 - [ ] Adicionar histórico de transações
 - [ ] Criar badges NFT para certificados de conclusão
 - [ ] Testar fluxo completo de gamificação
+
+## Bug - Erro de Perfil Duplicado no Dashboard
+- [ ] Corrigir lógica de criação de perfil no TalentDashboard
+- [ ] Verificar se perfil existe antes de tentar criar
+- [ ] Testar fluxo completo de criação de perfil
+
+## Bug - Erro de Perfil Duplicado + Melhoria de UX
+- [x] Corrigir lógica de criação de perfil no TalentDashboard
+- [x] Adicionar opções "Login" e "Novo Cadastro" no dashboard
+- [x] Redirecionar para página de cadastro quando necessário
+- [ ] Testar fluxo completo
+
+## Melhoria - Fluxo de Autenticação e Cadastro
+- [x] Separar autenticação (login) de criação de perfil
+- [x] Redirecionar login para dashboard ao invés de signup
+- [x] Após login, verificar se perfil existe
+- [x] Se perfil existe → dashboard
+- [x] Se perfil não existe → tela de escolha (criar perfil)
+- [ ] Testar fluxo completo de autenticação
