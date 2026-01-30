@@ -1,6 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Zap, Users, Shield } from "lucide-react";
+import { getLoginUrl } from "@/const";
 
 /**
  * Onboarding Page - Welcome Screen
@@ -83,14 +84,18 @@ export default function Onboarding() {
         <div className="space-y-6 w-full max-w-2xl mb-20">
           <div className="flex flex-col md:flex-row gap-6">
             <button
-              onClick={() => setLocation("/talent-signup")}
+              onClick={() => {
+                window.location.href = getLoginUrl('/talent-signup');
+              }}
               className="btn-cyber flex-1 text-center"
             >
               👩‍💻 Sou Talento
             </button>
             
             <button
-              onClick={() => setLocation("/employer-dashboard")}
+              onClick={() => {
+                window.location.href = getLoginUrl('/employer-dashboard');
+              }}
               className="btn-cyber-outline flex-1 text-center"
             >
               🏢 Sou Empresa
