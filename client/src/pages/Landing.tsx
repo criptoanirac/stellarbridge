@@ -61,24 +61,26 @@ export default function Landing() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-6 text-lg group"
-                >
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-6 text-lg group"
+              >
+                <Link href="/">
                   Começar Agora
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/impacto-social">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-magenta-500 text-magenta-400 hover:bg-magenta-500/10 px-8 py-6 text-lg"
-                >
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-2 border-magenta-500 text-magenta-400 hover:bg-magenta-500/10 px-8 py-6 text-lg"
+              >
+                <Link href="/impacto-social">
                   Ver Impacto Social
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             {/* Social Proof */}
@@ -357,16 +359,17 @@ export default function Landing() {
               </Card>
             </div>
 
-            <Link href="/impacto-social">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
-              >
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
+            >
+              <Link href="/impacto-social">
                 Ver Dashboard Completo de Impacto
                 <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -461,15 +464,16 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600 text-white px-12 py-6 text-lg group"
-                >
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600 text-white px-12 py-6 text-lg group"
+              >
+                <Link href="/">
                   Começar Minha Jornada
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <p className="text-sm text-slate-400 mt-8">
@@ -493,13 +497,11 @@ export default function Landing() {
               Construindo pontes para a liberdade profissional
             </p>
             <div className="flex gap-6 justify-center text-sm text-slate-400">
-              <Link href="/">
-                <a className="hover:text-cyan-400 transition-colors">Início</a>
+              <Link href="/" className="hover:text-cyan-400 transition-colors">
+                Início
               </Link>
-              <Link href="/impacto-social">
-                <a className="hover:text-cyan-400 transition-colors">
-                  Impacto Social
-                </a>
+              <Link href="/impacto-social" className="hover:text-cyan-400 transition-colors">
+                Impacto Social
               </Link>
               <a
                 href="https://github.com/yanirac/stellarbridge"

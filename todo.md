@@ -215,3 +215,7 @@
 - [x] Garantir responsividade mobile
 - [x] Adicionar rota /landing no App.tsx
 - [x] Testar em diferentes resoluções
+
+## Bug - Tags <a> Aninhadas na Landing Page
+- [x] Corrigir tags <a> aninhadas no footer da landing page
+- [x] Testar página sem erros no console
