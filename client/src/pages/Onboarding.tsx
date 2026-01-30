@@ -122,20 +122,12 @@ export default function Onboarding() {
           
           <div className="text-center">
             <p className="text-gray-400 text-sm mb-3">ou explore sem login:</p>
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setLocation("/impacto-social")}
-                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
-              >
-                🌍 Ver Impacto Social
-              </button>
-              <button
-                onClick={() => setLocation("/bridge")}
-                className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-magenta-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105"
-              >
-                🌉 Explorar Talentos
-              </button>
-            </div>
+            <button
+              onClick={() => setLocation("/impacto-social")}
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
+            >
+              🌍 Ver Impacto Social
+            </button>
           </div>
         </div>
 

@@ -9,10 +9,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Search, MapPin, Briefcase, Star, Heart, Home } from "lucide-react";
+import { Search, MapPin, Briefcase, Star, Heart, Home, Eye, GraduationCap, Award, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 /**
  * Bridge Page - Conexão entre Empresas e Talentos
@@ -24,6 +31,8 @@ export default function Bridge() {
   const [locationFilter, setLocationFilter] = useState("");
   const [experienceFilter, setExperienceFilter] = useState("");
   const [industryFilter, setIndustryFilter] = useState("");
+  const [selectedTalent, setSelectedTalent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch talents with filters
   const { data: talents, isLoading } = trpc.talent.list.useQuery({
@@ -233,13 +242,23 @@ export default function Bridge() {
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
+                    className="flex-1 border-magenta-500/30 hover:bg-magenta-500/10 hover:border-magenta-500/50"
+                    onClick={() => {
+                      setSelectedTalent(talent);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Ver Candidata
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
                     onClick={() =>
                       handleInterest(talent.id, talent.pseudonym || "")
                     }
                   >
-                    <Heart className="w-4 h-4 mr-2" />
-                    Demonstrar Interesse
+                    <Heart className="w-4 h-4" />
                   </Button>
                 </div>
 
@@ -297,6 +316,226 @@ export default function Bridge() {
           </div>
         )}
       </div>
+
+      {/* Modal de Detalhes da Candidata */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/30">
+          {selectedTalent && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl text-cyan-400">
+                  {selectedTalent.pseudonym}
+                </DialogTitle>
+                <DialogDescription className="text-slate-300 text-base">
+                  {selectedTalent.currentRole}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6 mt-4">
+                {/* Bio */}
+                {selectedTalent.bio && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-magenta-400 mb-2">Sobre</h3>
+                    <p className="text-slate-300">{selectedTalent.bio}</p>
+                  </div>
+                )}
+
+                {/* Informações Básicas */}
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedTalent.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-cyan-400" />
+                      <div>
+                        <p className="text-xs text-slate-400">Localização</p>
+                        <p className="text-slate-200">{selectedTalent.location}</p>
+                      </div>
+                    </div>
+                  )}
+                  {selectedTalent.yearsExperience && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-5 h-5 text-cyan-400" />
+                      <div>
+                        <p className="text-xs text-slate-400">Experiência</p>
+                        <p className="text-slate-200">{selectedTalent.yearsExperience} anos</p>
+                      </div>
+                    </div>
+                  )}
+                  {selectedTalent.industry && (
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-cyan-400" />
+                      <div>
+                        <p className="text-xs text-slate-400">Indústria</p>
+                        <p className="text-slate-200">{selectedTalent.industry}</p>
+                      </div>
+                    </div>
+                  )}
+                  {selectedTalent.level && (
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-magenta-400" />
+                      <div>
+                        <p className="text-xs text-slate-400">Nível</p>
+                        <p className="text-slate-200">Nível {selectedTalent.level} ({selectedTalent.xp || 0} XP)</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Skills */}
+                {selectedTalent.skills && selectedTalent.skills.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-magenta-400 mb-3 flex items-center gap-2">
+                      <Award className="w-5 h-5" />
+                      Habilidades
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTalent.skills.map((skill: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 text-sm bg-cyan-500/20 text-cyan-400 rounded border border-cyan-500/30"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Educação (Fictícia) */}
+                <div>
+                  <h3 className="text-lg font-semibold text-magenta-400 mb-3 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5" />
+                    Educação
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <p className="font-semibold text-slate-200">Bacharelado em Ciência da Computação</p>
+                      <p className="text-sm text-slate-400">Universidade Federal - 2018</p>
+                    </div>
+                    <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <p className="font-semibold text-slate-200">Técnico em Informática</p>
+                      <p className="text-sm text-slate-400">ETEC - 2014</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Certificações (Fictícias) */}
+                <div>
+                  <h3 className="text-lg font-semibold text-magenta-400 mb-3 flex items-center gap-2">
+                    <Award className="w-5 h-5" />
+                    Certificações
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <Award className="w-4 h-4 text-cyan-400" />
+                      <div>
+                        <p className="text-slate-200">AWS Certified Solutions Architect</p>
+                        <p className="text-xs text-slate-400">Amazon Web Services - 2023</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <Award className="w-4 h-4 text-cyan-400" />
+                      <div>
+                        <p className="text-slate-200">Professional Scrum Master I</p>
+                        <p className="text-xs text-slate-400">Scrum.org - 2022</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <Award className="w-4 h-4 text-cyan-400" />
+                      <div>
+                        <p className="text-slate-200">Google Cloud Professional Data Engineer</p>
+                        <p className="text-xs text-slate-400">Google Cloud - 2023</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Experiência Profissional (Fictícia) */}
+                <div>
+                  <h3 className="text-lg font-semibold text-magenta-400 mb-3 flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Experiência Profissional
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <p className="font-semibold text-slate-200">{selectedTalent.currentRole}</p>
+                      <p className="text-sm text-cyan-400">Tech Solutions Inc.</p>
+                      <p className="text-xs text-slate-400 mb-2">2021 - Presente</p>
+                      <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside">
+                        <li>Liderou equipe de 5 desenvolvedores em projetos de alta complexidade</li>
+                        <li>Implementou arquitetura de microserviços reduzindo custos em 30%</li>
+                        <li>Desenvolveu APIs REST consumidas por 100k+ usuários diários</li>
+                      </ul>
+                    </div>
+                    <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                      <p className="font-semibold text-slate-200">Desenvolvedora Pleno</p>
+                      <p className="text-sm text-cyan-400">Startup Inovadora Ltda.</p>
+                      <p className="text-xs text-slate-400 mb-2">2019 - 2021</p>
+                      <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside">
+                        <li>Desenvolveu features para plataforma SaaS com 50k usuários</li>
+                        <li>Participou de code reviews e mentorou desenvolvedores juniores</li>
+                        <li>Implementou testes automatizados aumentando cobertura para 85%</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Links */}
+                {(selectedTalent.portfolioUrl || selectedTalent.githubUrl || selectedTalent.linkedinUrl) && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-magenta-400 mb-3">Links</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {selectedTalent.portfolioUrl && (
+                        <a
+                          href={selectedTalent.portfolioUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded border border-cyan-500/30 hover:bg-cyan-500/30 transition-colors"
+                        >
+                          🌐 Portfólio
+                        </a>
+                      )}
+                      {selectedTalent.githubUrl && (
+                        <a
+                          href={selectedTalent.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded border border-cyan-500/30 hover:bg-cyan-500/30 transition-colors"
+                        >
+                          💻 GitHub
+                        </a>
+                      )}
+                      {selectedTalent.linkedinUrl && (
+                        <a
+                          href={selectedTalent.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded border border-cyan-500/30 hover:bg-cyan-500/30 transition-colors"
+                        >
+                          💼 LinkedIn
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Button */}
+                <div className="pt-4 border-t border-slate-700">
+                  <Button
+                    className="w-full bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600"
+                    onClick={() => {
+                      handleInterest(selectedTalent.id, selectedTalent.pseudonym || "");
+                      setIsModalOpen(false);
+                    }}
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    Demonstrar Interesse
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

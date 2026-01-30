@@ -173,3 +173,8 @@
 - [x] Verificar se endpoint talent.list está funcionando corretamente
 - [x] Garantir que talentos sejam carregados na página Bridge
 - [x] Corrigir seed para associar skills aos talentos corretamente
+
+## Melhorias na Página Bridge
+- [x] Remover botão "Explorar Talentos" da página inicial (Onboarding)
+- [x] Criar modal de detalhes da candidata na página Bridge
+- [x] Popular modal com informações fictícias completas (educação, certificações, experiência)
