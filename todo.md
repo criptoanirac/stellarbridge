@@ -200,3 +200,11 @@
 
 ## Documentação
 - [x] Criar README.md profissional para o repositório GitHub
+
+## Screenshots para Documentação
+- [x] Criar pasta docs/screenshots
+- [x] Capturar screenshot da página inicial (Onboarding)
+- [x] Capturar screenshot da página Bridge
+- [x] Capturar screenshot do Dashboard da Empresa
+- [x] Capturar screenshot do Dashboard de Impacto Social
+- [x] Atualizar README.md com seção de screenshots

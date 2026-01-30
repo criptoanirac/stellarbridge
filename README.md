@@ -12,6 +12,34 @@ Promover a empregabilidade feminina através de capacitação profissional, vali
 
 ---
 
+## 📸 Screenshots
+
+### Página Inicial
+
+![Página Inicial](docs/screenshots/01-home.webp)
+
+*Tela de boas-vindas com opções de login rápido para talentos e empresas, além de acesso ao dashboard de impacto social.*
+
+### Dashboard da Empresa
+
+![Dashboard da Empresa](docs/screenshots/02-employer-dashboard.webp)
+
+*Dashboard empresarial com matches automáticos, scores de compatibilidade e acesso ao banco de talentos verificados.*
+
+### Bridge - Banco de Talentos
+
+![Bridge](docs/screenshots/03-bridge.webp)
+
+*Página Bridge com listagem de talentos, filtros avançados por localização, experiência e skills, e cards informativos com perfis pseudonimizados.*
+
+### Dashboard de Impacto Social
+
+![Dashboard de Impacto Social](docs/screenshots/04-impacto-social.webp)
+
+*Painel público com métricas transparentes de impacto: mulheres capacitadas, vagas preenchidas, taxa de empregabilidade e gráficos interativos.*
+
+---
+
 ## ✨ Funcionalidades Principais
 
 ### 🔐 Recrutamento Blind (Às Cegas)
