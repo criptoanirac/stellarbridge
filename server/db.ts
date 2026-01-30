@@ -809,3 +809,102 @@ export async function generateCourseRecommendations(talentId: number) {
   
   return recommendations;
 }
+
+// List talents with filters
+export async function listTalents(filters: {
+  skills?: string[];
+  location?: string;
+  minExperience?: string;
+  industry?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { skills, location, minExperience, industry, limit = 20, offset = 0 } = filters;
+  
+  const conditions = [];
+  
+  if (location) {
+    conditions.push(sql`${talents.location} LIKE ${'%' + location + '%'}`);
+  }
+  
+  if (minExperience) {
+    conditions.push(eq(talents.yearsExperience, minExperience));
+  }
+  
+  if (industry) {
+    conditions.push(eq(talents.industry, industry));
+  }
+  
+  let query = db
+    .select({
+      id: talents.id,
+      userId: talents.userId,
+      pseudonym: talents.pseudonym,
+      bio: talents.bio,
+      currentRole: talents.currentRole,
+      yearsExperience: talents.yearsExperience,
+      industry: talents.industry,
+      location: talents.location,
+      portfolioUrl: talents.portfolioUrl,
+      githubUrl: talents.githubUrl,
+      linkedinUrl: talents.linkedinUrl,
+      xp: talents.xp,
+      level: talents.level,
+      createdAt: talents.createdAt,
+    })
+    .from(talents);
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  const results = await query.limit(limit).offset(offset);
+  
+  // If skills filter is provided, filter by skills
+  if (skills && skills.length > 0) {
+    const talentsWithSkills = await Promise.all(
+      results.map(async (talent) => {
+        const skills_list = await db
+          .select()
+          .from(talentSkills)
+          .where(eq(talentSkills.talentId, talent.id));
+        
+        const hasMatchingSkills = skills.some((skill) =>
+          skills_list.some((ts) => 
+            ts.skill.toLowerCase().includes(skill.toLowerCase())
+          )
+        );
+        
+        if (hasMatchingSkills) {
+          return {
+            ...talent,
+            skills: skills_list.map(s => s.skill),
+          };
+        }
+        return null;
+      })
+    );
+    
+    return talentsWithSkills.filter((t) => t !== null);
+  }
+  
+  // Add skills to all results
+  const talentsWithSkills = await Promise.all(
+    results.map(async (talent) => {
+      const skills_list = await db
+        .select()
+        .from(talentSkills)
+        .where(eq(talentSkills.talentId, talent.id));
+      
+      return {
+        ...talent,
+        skills: skills_list.map(s => s.skill),
+      };
+    })
+  );
+  
+  return talentsWithSkills;
+}

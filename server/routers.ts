@@ -167,6 +167,20 @@ export const appRouter = router({
         
         return { success: true };
       }),
+    
+    // List talents with filters
+    list: publicProcedure
+      .input(z.object({
+        skills: z.array(z.string()).optional(),
+        location: z.string().optional(),
+        minExperience: z.string().optional(),
+        industry: z.string().optional(),
+        limit: z.number().default(20),
+        offset: z.number().default(0),
+      }))
+      .query(async ({ input }) => {
+        return db.listTalents(input);
+      }),
   }),
   
   // Company routes

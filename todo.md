@@ -159,3 +159,11 @@
 - [x] Verificar se userId já existe na tabela talents
 - [x] Corrigir lógica de inserção ou adicionar verificação de duplicatas
 - [x] Testar criação de perfil completa
+
+## Página Bridge - Conexão Empresas x Talentos
+- [x] Criar endpoint talent.list com filtros (skills, localização, experiência)
+- [x] Popular banco com 7 candidatas fictícias diversas (seed já executado)
+- [x] Criar página Bridge.tsx com listagem de cards
+- [x] Implementar filtros de busca (skills, localização, experiência)
+- [x] Adicionar funcionalidade de match/interesse
+- [x] Testar listagem e filtros
