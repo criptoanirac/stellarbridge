@@ -50,7 +50,7 @@ export default function Onboarding() {
           
           {/* Dev Mode Notice */}
           <div className="bg-gradient-to-r from-cyan-500/10 to-magenta-500/10 border border-cyan-500/30 rounded-lg p-4 mb-8 max-w-md mx-auto">
-            <p className="text-sm text-cyan-300 text-center">
+            <p className="text-sm text-cyan-300 text-center" style={{fontSize: '10px'}}>
               ⚡ <strong>Modo de Desenvolvimento:</strong> Use os botões de Login Rápido abaixo para testar a plataforma sem autenticação real.
             </p>
           </div>
