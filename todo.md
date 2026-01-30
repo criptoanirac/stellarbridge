@@ -186,3 +186,8 @@
 
 ## Melhoria de Navegação - Bridge
 - [x] Substituir botão "Home" por "Voltar" na página Bridge
+
+## Bug - Botão Voltar não Funciona
+- [x] Investigar por que botão Voltar não está funcionando na página Bridge
+- [x] Corrigir implementação do botão
+- [x] Testar navegação completa

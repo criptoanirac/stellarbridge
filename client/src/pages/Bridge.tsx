@@ -11,7 +11,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { Search, MapPin, Briefcase, Star, Heart, ArrowLeft, Eye, GraduationCap, Award, Calendar } from "lucide-react";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -75,10 +75,12 @@ export default function Bridge() {
                 Conectando talentos e oportunidades
               </span>
             </div>
-            <Button variant="outline" size="sm" onClick={() => window.history.back()}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
+            <Link href="/employer-dashboard">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
