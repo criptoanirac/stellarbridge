@@ -136,3 +136,15 @@
 - [x] Implementar redirecionamento correto pós-login
 - [x] Testar criação de perfil completo
 - [x] Criar documentação do processo de autenticação
+
+## Debug de Autenticação
+- [ ] Verificar logs do servidor para erros de OAuth
+- [ ] Testar fluxo completo de login manualmente
+- [ ] Verificar configuração de variáveis de ambiente
+- [ ] Corrigir problema identificado
+
+## Autenticação Fictícia para Testes
+- [x] Criar endpoint /api/dev-login para autenticação fictícia
+- [x] Adicionar botão "Login Rápido" na página inicial
+- [x] Implementar criação automática de usuário de teste
+- [x] Testar fluxo completo de login fictício

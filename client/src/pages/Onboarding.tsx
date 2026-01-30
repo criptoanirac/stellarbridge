@@ -48,10 +48,10 @@ export default function Onboarding() {
             Capacitação, validação em blockchain e conexões reais
           </p>
           
-          {/* Auth Notice */}
-          <div className="bg-cyan/10 border border-cyan/30 rounded-lg p-4 mb-8 max-w-md mx-auto">
-            <p className="text-sm text-cyan-300">
-              🔒 <strong>Autenticação necessária:</strong> Ao clicar em "Sou Talento" ou "Sou Empresa", você será direcionado para fazer login com sua conta Manus.
+          {/* Dev Mode Notice */}
+          <div className="bg-gradient-to-r from-cyan-500/10 to-magenta-500/10 border border-cyan-500/30 rounded-lg p-4 mb-8 max-w-md mx-auto">
+            <p className="text-sm text-cyan-300 text-center">
+              ⚡ <strong>Modo de Desenvolvimento:</strong> Use os botões de Login Rápido abaixo para testar a plataforma sem autenticação real.
             </p>
           </div>
           
@@ -82,7 +82,25 @@ export default function Onboarding() {
 
         {/* Action Buttons */}
         <div className="space-y-6 w-full max-w-2xl mb-20">
+          {/* Dev Quick Login Buttons */}
           <div className="flex flex-col md:flex-row gap-6">
+            <a
+              href="/api/dev-login?redirect=/talent-signup"
+              className="btn-cyber flex-1 text-center"
+            >
+              ⚡ Login Rápido - Talento
+            </a>
+            
+            <a
+              href="/api/dev-login?redirect=/employer-dashboard"
+              className="btn-cyber-outline flex-1 text-center"
+            >
+              ⚡ Login Rápido - Empresa
+            </a>
+          </div>
+          
+          {/* Production OAuth Buttons (commented for dev) */}
+          {/* <div className="flex flex-col md:flex-row gap-6">
             <button
               onClick={() => {
                 window.location.href = getLoginUrl('/talent-signup');
@@ -100,7 +118,7 @@ export default function Onboarding() {
             >
               🏢 Sou Empresa
             </button>
-          </div>
+          </div> */}
           
           <div className="text-center">
             <p className="text-gray-400 text-sm mb-3">ou explore sem login:</p>

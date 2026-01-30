@@ -10,6 +10,41 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  // DEV ONLY: Fake login endpoint for testing without real OAuth
+  app.get("/api/dev-login", async (req: Request, res: Response) => {
+    try {
+      const fakeOpenId = "dev-user-" + Date.now();
+      const fakeName = "Usuário de Teste";
+      const fakeEmail = "teste@stellarbridge.dev";
+
+      // Create or update fake user in database
+      await db.upsertUser({
+        openId: fakeOpenId,
+        name: fakeName,
+        email: fakeEmail,
+        loginMethod: "dev",
+        lastSignedIn: new Date(),
+      });
+
+      // Create session token
+      const sessionToken = await sdk.createSessionToken(fakeOpenId, {
+        name: fakeName,
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      // Set cookie
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      // Redirect to specified path or home
+      const redirectPath = (req.query.redirect as string) || "/";
+      res.redirect(302, redirectPath);
+    } catch (error) {
+      console.error("[DevLogin] Failed", error);
+      res.status(500).json({ error: "Dev login failed" });
+    }
+  });
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
