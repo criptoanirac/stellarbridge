@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
-import { Users, Briefcase, TrendingUp, DollarSign, Award, Building2, MapPin, Calendar } from "lucide-react";
+import { Users, Briefcase, TrendingUp, DollarSign, Award, Building2, MapPin, Calendar, Home } from "lucide-react";
+import { Link } from "wouter";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo } from "react";
@@ -115,6 +116,13 @@ export default function SocialImpact() {
             </div>
             
             <div className="flex items-center gap-3">
+              <Link href="/">
+                <button className="flex items-center gap-2 px-4 py-2 bg-cyan/10 hover:bg-cyan/20 border border-cyan/30 hover:border-cyan rounded-lg text-cyan transition-all">
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
+                </button>
+              </Link>
+              
               <Calendar className="w-5 h-5 text-cyan" />
               <Select value={period} onValueChange={(value) => setPeriod(value as PeriodOption)}>
                 <SelectTrigger className="w-[200px] bg-dark-bg/50 border-cyan/30 text-gray-300">

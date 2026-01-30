@@ -120,3 +120,6 @@
 - [x] Adicionar 30+ conquistas distribuídas entre talentos
 - [x] Gerar 40+ recomendações de cursos
 - [x] Executar seed e testar visualização
+
+## Navegação - Botão Home
+- [x] Adicionar botão "Voltar para Home" no header da página SocialImpact
