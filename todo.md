@@ -191,3 +191,12 @@
 - [x] Investigar por que botão Voltar não está funcionando na página Bridge
 - [x] Corrigir implementação do botão
 - [x] Testar navegação completa
+
+## Configuração GitHub
+- [ ] Autenticar no GitHub CLI
+- [ ] Criar repositório stellarbridge
+- [ ] Enviar código para GitHub
+- [ ] Fornecer instruções de acesso ao usuário
+
+## Documentação
+- [x] Criar README.md profissional para o repositório GitHub
