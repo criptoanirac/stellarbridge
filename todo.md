@@ -219,3 +219,16 @@
 ## Bug - Tags <a> Aninhadas na Landing Page
 - [x] Corrigir tags <a> aninhadas no footer da landing page
 - [x] Testar página sem erros no console
+
+## Gamificação Financeira com XLM
+- [x] Planejar estrutura de dados (cursos, módulos, recompensas, transações)
+- [x] Criar schema no banco de dados para cursos e módulos
+- [x] Criar schema para transações XLM e saldos
+- [x] Implementar tRPC procedures para gerenciar ganhos
+- [x] Criar página "Meus Ganhos" com saldo XLM (versão MVP com dados fictícios)
+- [ ] Integrar Freighter wallet (carteira Stellar) - Adiado para próxima fase
+- [x] Criar dashboard de cursos com recompensas visíveis (MVP simplificado)
+- [ ] Implementar sistema de liberação de XLM por módulo concluído
+- [ ] Adicionar histórico de transações
+- [ ] Criar badges NFT para certificados de conclusão
+- [ ] Testar fluxo completo de gamificação

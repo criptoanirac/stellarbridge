@@ -327,6 +327,157 @@ export const appRouter = router({
       }),
   }),
 
+  // Wallet & XLM Management
+  wallet: router({
+    // Get wallet balance
+    getBalance: protectedProcedure.query(async ({ ctx }) => {
+      return db.getOrCreateWallet(ctx.user.id);
+    }),
+    
+    // Get transaction history
+    getTransactions: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return db.getXlmTransactions(ctx.user.id, input?.limit, input?.offset);
+      }),
+    
+    // Connect Stellar wallet
+    connectStellar: protectedProcedure
+      .input(z.object({
+        stellarAddress: z.string().min(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.updateWalletAddress(ctx.user.id, input.stellarAddress);
+      }),
+    
+    // Disconnect Stellar wallet
+    disconnectStellar: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return db.updateWalletAddress(ctx.user.id, null);
+      }),
+  }),
+  
+  // Courses & Learn-to-Earn
+  courses: router({
+    // List all available courses
+    list: publicProcedure
+      .input(z.object({
+        category: z.enum(["web3", "ia", "vendas", "design", "programacao"]).optional(),
+        difficulty: z.enum(["basico", "intermediario", "avancado"]).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.listCourses(input?.category, input?.difficulty);
+      }),
+    
+    // Get course details with modules
+    getById: publicProcedure
+      .input(z.object({ courseId: z.number() }))
+      .query(async ({ input }) => {
+        const course = await db.getCourseById(input.courseId);
+        if (!course) throw new Error("Curso não encontrado");
+        
+        const modules = await db.getCourseModules(input.courseId);
+        return { ...course, modules };
+      }),
+    
+    // Enroll in course
+    enroll: protectedProcedure
+      .input(z.object({ courseId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if already enrolled
+        const existing = await db.getUserCourseProgress(ctx.user.id, input.courseId);
+        if (existing) {
+          throw new Error("Você já está inscrito neste curso");
+        }
+        
+        // Get course to calculate locked XLM
+        const course = await db.getCourseById(input.courseId);
+        if (!course) throw new Error("Curso não encontrado");
+        
+        // Create progress record
+        await db.enrollUserInCourse(ctx.user.id, input.courseId);
+        
+        // Update wallet locked XLM
+        await db.lockXlmForCourse(ctx.user.id, Number(course.totalRewardXlm));
+        
+        return { success: true };
+      }),
+    
+    // Get user's enrolled courses
+    getEnrolled: protectedProcedure.query(async ({ ctx }) => {
+      return db.getUserEnrolledCourses(ctx.user.id);
+    }),
+    
+    // Complete module
+    completeModule: protectedProcedure
+      .input(z.object({
+        moduleId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get module details
+        const module = await db.getCourseModuleById(input.moduleId);
+        if (!module) throw new Error("Módulo não encontrado");
+        
+        // Check if user is enrolled in the course
+        const progress = await db.getUserCourseProgress(ctx.user.id, module.courseId);
+        if (!progress) {
+          throw new Error("Você não está inscrito neste curso");
+        }
+        
+        // Check if module already completed
+        const completed = await db.isModuleCompleted(ctx.user.id, input.moduleId);
+        if (completed) {
+          throw new Error("Módulo já concluído");
+        }
+        
+        // Mark module as completed
+        await db.completeModule(ctx.user.id, input.moduleId, Number(module.rewardXlm));
+        
+        // Update wallet: unlock and make available
+        await db.unlockAndAddXlm(ctx.user.id, Number(module.rewardXlm));
+        
+        // Create transaction record
+        await db.createXlmTransaction({
+          userId: ctx.user.id,
+          type: "earn" as any,
+          amountXlm: String(module.rewardXlm),
+          description: `Módulo concluído: ${module.title}`,
+          moduleId: input.moduleId,
+          status: "completed" as any,
+        });
+        
+        // Check if all modules completed
+        const allModules = await db.getCourseModules(module.courseId);
+        const completedModules = await db.getCompletedModules(ctx.user.id, module.courseId);
+        
+        if (completedModules.length === allModules.length) {
+          // Mark course as completed
+          await db.completeCourse(ctx.user.id, module.courseId);
+          
+          // Award bonus XP
+          const talent = await db.getTalentByUserId(ctx.user.id);
+          if (talent) {
+            await db.updateTalentXP(talent.id, 100); // Bonus XP for course completion
+            await db.addTalentProgress({
+              talentId: talent.id,
+              eventType: "course_completed",
+              xpGained: 100,
+              description: `Curso concluído: ${(await db.getCourseById(module.courseId))?.title}`,
+            });
+          }
+        }
+        
+        return {
+          success: true,
+          xlmEarned: Number(module.rewardXlm),
+          courseCompleted: completedModules.length + 1 === allModules.length,
+        };
+      }),
+  }),
+  
   // Professional Development (Career Plan & Gamification)
   professionalDevelopment: router({
     // Get dashboard metrics

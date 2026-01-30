@@ -1,6 +1,6 @@
-import { eq, sql, desc, asc, and, gte, lte } from "drizzle-orm";
+import { eq, and, or, desc, sql, asc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories, careerPlans, InsertCareerPlan, achievements, InsertAchievement, talentProgress, InsertTalentProgress, courseRecommendations, InsertCourseRecommendation } from "../drizzle/schema";
+import { InsertUser, users, talents, InsertTalent, companies, InsertCompany, jobPostings, InsertJobPosting, talentSkills, InsertTalentSkill, talentEducation, InsertTalentEducation, talentCertifications, InsertTalentCertification, matches, InsertMatch, successStories, careerPlans, InsertCareerPlan, achievements, InsertAchievement, talentProgress, InsertTalentProgress, courseRecommendations, InsertCourseRecommendation, courses, InsertCourse, courseModules, InsertCourseModule, userWallet, InsertUserWallet, xlmTransactions, InsertXlmTransaction, userCourseProgress, InsertUserCourseProgress, userModuleCompletion, InsertUserModuleCompletion } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -907,4 +907,272 @@ export async function listTalents(filters: {
   );
   
   return talentsWithSkills;
+}
+
+// ============================================
+// GAMIFICATION & LEARN-TO-EARN FUNCTIONS
+// ============================================
+
+/**
+ * Wallet Management
+ */
+export async function getOrCreateWallet(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await db.select().from(userWallet).where(eq(userWallet.userId, userId)).limit(1);
+  
+  if (existing.length > 0) {
+    return existing[0];
+  }
+  
+  // Create new wallet
+  await db.insert(userWallet).values({
+    userId,
+    totalEarnedXlm: "0.00",
+    availableXlm: "0.00",
+    lockedXlm: "0.00",
+  });
+  
+  const newWallet = await db.select().from(userWallet).where(eq(userWallet.userId, userId)).limit(1);
+  return newWallet[0];
+}
+
+export async function updateWalletAddress(userId: number, stellarAddress: string | null) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(userWallet)
+    .set({ stellarAddress })
+    .where(eq(userWallet.userId, userId));
+  
+  return { success: true };
+}
+
+export async function lockXlmForCourse(userId: number, amount: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const wallet = await getOrCreateWallet(userId);
+  const newLocked = Number(wallet.lockedXlm) + amount;
+  
+  await db.update(userWallet)
+    .set({ lockedXlm: String(newLocked) })
+    .where(eq(userWallet.userId, userId));
+}
+
+export async function unlockAndAddXlm(userId: number, amount: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const wallet = await getOrCreateWallet(userId);
+  const newLocked = Math.max(0, Number(wallet.lockedXlm) - amount);
+  const newAvailable = Number(wallet.availableXlm) + amount;
+  const newTotal = Number(wallet.totalEarnedXlm) + amount;
+  
+  await db.update(userWallet)
+    .set({
+      lockedXlm: String(newLocked),
+      availableXlm: String(newAvailable),
+      totalEarnedXlm: String(newTotal),
+    })
+    .where(eq(userWallet.userId, userId));
+}
+
+/**
+ * XLM Transactions
+ */
+export async function getXlmTransactions(userId: number, limit: number = 50, offset: number = 0) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select()
+    .from(xlmTransactions)
+    .where(eq(xlmTransactions.userId, userId))
+    .orderBy(desc(xlmTransactions.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function createXlmTransaction(transaction: InsertXlmTransaction) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(xlmTransactions).values(transaction);
+  return { success: true };
+}
+
+/**
+ * Courses
+ */
+export async function listCourses(category?: string, difficulty?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const conditions = [eq(courses.status, "active")];
+  
+  if (category) {
+    conditions.push(eq(courses.category, category as any));
+  }
+  
+  if (difficulty) {
+    conditions.push(eq(courses.difficulty, difficulty as any));
+  }
+  
+  return db.select().from(courses).where(and(...conditions));
+}
+
+export async function getCourseById(courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
+  return result[0] || null;
+}
+
+export async function getCourseModules(courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select()
+    .from(courseModules)
+    .where(eq(courseModules.courseId, courseId))
+    .orderBy(asc(courseModules.order));
+}
+
+export async function getCourseModuleById(moduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(courseModules).where(eq(courseModules.id, moduleId)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * User Course Progress
+ */
+export async function getUserCourseProgress(userId: number, courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select()
+    .from(userCourseProgress)
+    .where(and(
+      eq(userCourseProgress.userId, userId),
+      eq(userCourseProgress.courseId, courseId)
+    ))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function enrollUserInCourse(userId: number, courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(userCourseProgress).values({
+    userId,
+    courseId,
+    status: "in_progress",
+    startedAt: new Date(),
+  });
+  
+  return { success: true };
+}
+
+export async function getUserEnrolledCourses(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get user's course progress
+  const progress = await db.select()
+    .from(userCourseProgress)
+    .where(eq(userCourseProgress.userId, userId))
+    .orderBy(desc(userCourseProgress.createdAt));
+  
+  // Get course details for each
+  const coursesWithProgress = [];
+  for (const p of progress) {
+    const course = await getCourseById(p.courseId);
+    if (course) {
+      const modules = await getCourseModules(p.courseId);
+      const completedModules = await getCompletedModules(userId, p.courseId);
+      
+      coursesWithProgress.push({
+        ...course,
+        progress: p,
+        totalModules: modules.length,
+        completedModules: completedModules.length,
+        modules,
+      });
+    }
+  }
+  
+  return coursesWithProgress;
+}
+
+export async function completeCourse(userId: number, courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(userCourseProgress)
+    .set({
+      status: "completed",
+      completedAt: new Date(),
+    })
+    .where(and(
+      eq(userCourseProgress.userId, userId),
+      eq(userCourseProgress.courseId, courseId)
+    ));
+}
+
+/**
+ * Module Completion
+ */
+export async function isModuleCompleted(userId: number, moduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select()
+    .from(userModuleCompletion)
+    .where(and(
+      eq(userModuleCompletion.userId, userId),
+      eq(userModuleCompletion.moduleId, moduleId)
+    ))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+export async function completeModule(userId: number, moduleId: number, xlmEarned: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(userModuleCompletion).values({
+    userId,
+    moduleId,
+    xlmEarned: String(xlmEarned),
+    completedAt: new Date(),
+  });
+  
+  return { success: true };
+}
+
+export async function getCompletedModules(userId: number, courseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get all modules for the course
+  const modules = await getCourseModules(courseId);
+  const moduleIds = modules.map(m => m.id);
+  
+  // Get completed modules
+  const completed = await db.select()
+    .from(userModuleCompletion)
+    .where(and(
+      eq(userModuleCompletion.userId, userId),
+      inArray(userModuleCompletion.moduleId, moduleIds)
+    ));
+  
+  return completed;
 }

@@ -20,6 +20,7 @@ import TrainingHub from "./pages/TrainingHub";
 import ProfessionalDevelopment from "./pages/ProfessionalDevelopment";
 import Bridge from "./pages/Bridge";
 import Landing from "./pages/Landing";
+import MyEarnings from "./pages/MyEarnings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -31,6 +32,7 @@ function Router() {
       <Route path={"/talent-dashboard"} component={TalentDashboard} />
       <Route path={"/training-hub"} component={TrainingHub} />
       <Route path={"/professional-development"} component={ProfessionalDevelopment} />
+      <Route path={"/my-earnings"} component={MyEarnings} />
       <Route path={"/bridge"} component={Bridge} />
       <Route path={"/employer-dashboard"} component={EmployerDashboard} />
       <Route path={"/post-job"} component={PostJob} />

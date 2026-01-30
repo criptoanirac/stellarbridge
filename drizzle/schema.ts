@@ -401,3 +401,176 @@ export const courseRecommendationsRelations = relations(courseRecommendations, (
     references: [talents.id],
   }),
 }));
+
+/**
+ * Courses (Learn-to-Earn)
+ * Stores available courses with XLM rewards
+ */
+export const courses = mysqlTable("courses", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: mysqlEnum("category", ["web3", "ia", "vendas", "design", "programacao"]).notNull(),
+  difficulty: mysqlEnum("difficulty", ["basico", "intermediario", "avancado"]).notNull(),
+  totalRewardXlm: decimal("totalRewardXlm", { precision: 10, scale: 2 }).notNull(),
+  durationHours: int("durationHours").notNull(),
+  imageUrl: varchar("imageUrl", { length: 500 }),
+  provider: varchar("provider", { length: 255 }), // e.g., "Mulheres que Codam", "Sebrae"
+  status: mysqlEnum("status", ["active", "archived"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Course = typeof courses.$inferSelect;
+export type InsertCourse = typeof courses.$inferInsert;
+
+/**
+ * Course Modules
+ * Individual modules within courses
+ */
+export const courseModules = mysqlTable("courseModules", {
+  id: int("id").autoincrement().primaryKey(),
+  courseId: int("courseId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  order: int("order").notNull(), // Order within the course
+  rewardXlm: decimal("rewardXlm", { precision: 10, scale: 2 }).notNull(),
+  contentUrl: varchar("contentUrl", { length: 500 }), // Link to course content
+  estimatedMinutes: int("estimatedMinutes"), // Estimated time to complete
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CourseModule = typeof courseModules.$inferSelect;
+export type InsertCourseModule = typeof courseModules.$inferInsert;
+
+/**
+ * User Course Progress
+ * Tracks which courses users are enrolled in
+ */
+export const userCourseProgress = mysqlTable("userCourseProgress", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  courseId: int("courseId").notNull(),
+  status: mysqlEnum("status", ["not_started", "in_progress", "completed"]).default("not_started").notNull(),
+  startedAt: timestamp("startedAt"),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserCourseProgress = typeof userCourseProgress.$inferSelect;
+export type InsertUserCourseProgress = typeof userCourseProgress.$inferInsert;
+
+/**
+ * User Module Completion
+ * Tracks completed modules and XLM earned
+ */
+export const userModuleCompletion = mysqlTable("userModuleCompletion", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  moduleId: int("moduleId").notNull(),
+  completedAt: timestamp("completedAt").defaultNow().notNull(),
+  xlmEarned: decimal("xlmEarned", { precision: 10, scale: 2 }).notNull(),
+  transactionHash: varchar("transactionHash", { length: 255 }), // For future blockchain integration
+});
+
+export type UserModuleCompletion = typeof userModuleCompletion.$inferSelect;
+export type InsertUserModuleCompletion = typeof userModuleCompletion.$inferInsert;
+
+/**
+ * User Wallet
+ * Stores XLM balance and Stellar address
+ */
+export const userWallet = mysqlTable("userWallet", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  stellarAddress: varchar("stellarAddress", { length: 56 }), // Stellar public key
+  totalEarnedXlm: decimal("totalEarnedXlm", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  availableXlm: decimal("availableXlm", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  lockedXlm: decimal("lockedXlm", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  lastUpdated: timestamp("lastUpdated").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UserWallet = typeof userWallet.$inferSelect;
+export type InsertUserWallet = typeof userWallet.$inferInsert;
+
+/**
+ * XLM Transactions
+ * Tracks all XLM movements (earn, withdraw, bonus)
+ */
+export const xlmTransactions = mysqlTable("xlmTransactions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: mysqlEnum("type", ["earn", "withdraw", "bonus", "refund"]).notNull(),
+  amountXlm: decimal("amountXlm", { precision: 10, scale: 2 }).notNull(),
+  description: text("description").notNull(),
+  moduleId: int("moduleId"), // Reference to module if type is 'earn'
+  transactionHash: varchar("transactionHash", { length: 255 }), // Stellar transaction hash
+  status: mysqlEnum("status", ["pending", "completed", "failed"]).default("completed").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type XlmTransaction = typeof xlmTransactions.$inferSelect;
+export type InsertXlmTransaction = typeof xlmTransactions.$inferInsert;
+
+/**
+ * Relations for gamification tables
+ */
+export const coursesRelations = relations(courses, ({ many }) => ({
+  modules: many(courseModules),
+  userProgress: many(userCourseProgress),
+}));
+
+export const courseModulesRelations = relations(courseModules, ({ one, many }) => ({
+  course: one(courses, {
+    fields: [courseModules.courseId],
+    references: [courses.id],
+  }),
+  completions: many(userModuleCompletion),
+}));
+
+export const userCourseProgressRelations = relations(userCourseProgress, ({ one }) => ({
+  user: one(users, {
+    fields: [userCourseProgress.userId],
+    references: [users.id],
+  }),
+  course: one(courses, {
+    fields: [userCourseProgress.courseId],
+    references: [courses.id],
+  }),
+}));
+
+export const userModuleCompletionRelations = relations(userModuleCompletion, ({ one }) => ({
+  user: one(users, {
+    fields: [userModuleCompletion.userId],
+    references: [users.id],
+  }),
+  module: one(courseModules, {
+    fields: [userModuleCompletion.moduleId],
+    references: [courseModules.id],
+  }),
+}));
+
+export const userWalletRelations = relations(userWallet, ({ one, many }) => ({
+  user: one(users, {
+    fields: [userWallet.userId],
+    references: [users.id],
+  }),
+  transactions: many(xlmTransactions),
+}));
+
+export const xlmTransactionsRelations = relations(xlmTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [xlmTransactions.userId],
+    references: [users.id],
+  }),
+  wallet: one(userWallet, {
+    fields: [xlmTransactions.userId],
+    references: [userWallet.userId],
+  }),
+  module: one(courseModules, {
+    fields: [xlmTransactions.moduleId],
+    references: [courseModules.id],
+  }),
+}));
