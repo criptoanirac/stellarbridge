@@ -148,3 +148,8 @@
 - [x] Adicionar botão "Login Rápido" na página inicial
 - [x] Implementar criação automática de usuário de teste
 - [x] Testar fluxo completo de login fictício
+
+## Correção de Erro - Criação de Perfil
+- [x] Investigar endpoint talent.createProfile no routers.ts
+- [x] Corrigir retorno de insertId
+- [x] Testar criação completa de perfil com skills e education

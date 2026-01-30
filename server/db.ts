@@ -94,7 +94,8 @@ export async function createTalent(talent: InsertTalent) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(talents).values(talent);
-  return result;
+  // Return the insertId from the result
+  return { insertId: Number((result as any).insertId) || Number((result as any)[0]?.insertId) };
 }
 
 export async function getTalentByUserId(userId: number) {
