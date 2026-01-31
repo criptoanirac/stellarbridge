@@ -256,3 +256,11 @@
 - [x] Adicionar item "Meus Ganhos" no sidebar do TalentDashboard
 - [x] Adicionar ícone apropriado (Wallet)
 - [x] Testar navegação entre dashboard e página de ganhos
+
+## Feature - Nome Social
+- [x] Adicionar campo socialName ao schema talentProfile
+- [x] Atualizar formulário TalentSignup com campo Nome Social
+- [x] Atualizar TalentDashboard para exibir Nome Social
+- [x] Atualizar Bridge para exibir Nome Social das candidatas
+- [x] Atualizar todos os lugares onde nome é exibido
+- [ ] Testar cadastro e visualização completos

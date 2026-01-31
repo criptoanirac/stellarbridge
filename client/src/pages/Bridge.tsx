@@ -47,15 +47,15 @@ export default function Bridge() {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return (
-      talent.pseudonym?.toLowerCase().includes(search) ||
+      (talent.socialName || talent.pseudonym)?.toLowerCase().includes(search) ||
       talent.bio?.toLowerCase().includes(search) ||
       talent.currentRole?.toLowerCase().includes(search) ||
       talent.skills?.some((s) => s.toLowerCase().includes(search))
     );
   });
 
-  const handleInterest = (talentId: number, pseudonym: string) => {
-    toast.success(`Interesse demonstrado em ${pseudonym}!`, {
+  const handleInterest = (talentId: number, name: string) => {
+    toast.success(`Interesse demonstrado em ${name}!`, {
       description: "A candidata será notificada sobre seu interesse.",
     });
   };
@@ -178,7 +178,7 @@ export default function Bridge() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-cyan-400 mb-1">
-                      {talent.pseudonym}
+                      {talent.socialName || talent.pseudonym}
                     </h3>
                     <p className="text-sm text-slate-300">
                       {talent.currentRole}
@@ -255,7 +255,7 @@ export default function Bridge() {
                     variant="outline"
                     className="border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
                     onClick={() =>
-                      handleInterest(talent.id, talent.pseudonym || "")
+                      handleInterest(talent.id, talent.socialName || talent.pseudonym || "")
                     }
                   >
                     <Heart className="w-4 h-4" />
@@ -324,7 +324,7 @@ export default function Bridge() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-2xl text-cyan-400">
-                  {selectedTalent.pseudonym}
+                  {selectedTalent.socialName || selectedTalent.pseudonym}
                 </DialogTitle>
                 <DialogDescription className="text-slate-300 text-base">
                   {selectedTalent.currentRole}
@@ -523,7 +523,7 @@ export default function Bridge() {
                   <Button
                     className="w-full bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600"
                     onClick={() => {
-                      handleInterest(selectedTalent.id, selectedTalent.pseudonym || "");
+                      handleInterest(selectedTalent.id, selectedTalent.socialName || selectedTalent.pseudonym || "");
                       setIsModalOpen(false);
                     }}
                   >

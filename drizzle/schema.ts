@@ -34,6 +34,7 @@ export const talents = mysqlTable("talents", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull().unique(),
   pseudonym: varchar("pseudonym", { length: 64 }).notNull().unique(),
+  socialName: varchar("socialName", { length: 255 }),
   bio: text("bio"),
   currentRole: varchar("currentRole", { length: 255 }),
   yearsExperience: varchar("yearsExperience", { length: 50 }),

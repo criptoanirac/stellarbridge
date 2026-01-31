@@ -32,6 +32,7 @@ export default function TalentSignup() {
     // Personal Info
     firstName: "",
     lastName: "",
+    socialName: "",
     email: "",
     phone: "",
     location: "",
@@ -153,20 +154,17 @@ export default function TalentSignup() {
     const sampleData = {
       firstName: "Ana",
       lastName: "Silva",
+      socialName: "Ana",
       email: "ana.silva@email.com",
       phone: "(11) 98765-4321",
       location: "São Paulo, SP",
-      bio: "Desenvolvedora Full Stack apaixonada por criar soluções inovadoras que impactam positivamente a vida das pessoas.",
+      bio: "Desenvolvedora Full Stack apaixonada por tecnologia e inovação. Especializada em React, Node.js e arquitetura de microsserviços.",
       currentRole: "Desenvolvedora Full Stack",
       yearsExperience: "3-5",
       industry: "Tecnologia",
-      skills: ["React", "Node.js", "TypeScript", "PostgreSQL"],
+      skills: ["React", "Node.js", "TypeScript", "PostgreSQL", "AWS"],
       education: [
-        {
-          school: "Universidade de São Paulo",
-          degree: "Bacharelado em Ciência da Computação",
-          year: "2020",
-        },
+        { school: "Universidade de São Paulo", degree: "Ciência da Computação", year: "2020" },
       ],
       certifications: ["AWS Certified Solutions Architect"],
       portfolioUrl: "https://anasilva.dev",
@@ -271,6 +269,7 @@ export default function TalentSignup() {
       // Create talent profile
       const profile = await createProfileMutation.mutateAsync({
         pseudonym,
+        socialName: formData.socialName || undefined,
         bio: formData.bio || undefined,
         currentRole: formData.currentRole || undefined,
         yearsExperience: formData.yearsExperience || undefined,
@@ -392,9 +391,7 @@ export default function TalentSignup() {
           {/* Step 1: Personal Info */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-cyan-400 mb-6">Dados Pessoais</h2>
-
-              <div className="grid grid-cols-2 gap-4">
+              <h2 className="text-2xl font-bold text-cyan-400 mb-6">Dados Pessoais</h2>              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Nome <span className="text-red-500">*</span>
@@ -435,6 +432,19 @@ export default function TalentSignup() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Nome Social 💜
+                </label>
+                <input
+                  type="text"
+                  name="socialName"
+                  value={formData.socialName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:outline-none focus:border-cyan-500 text-white"
+                  placeholder="Como você gostaria de ser chamada"
+                />
+                <p className="text-gray-400 text-xs mt-1">Este será o nome exibido em toda a plataforma</p>
+              </div>   <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Email <span className="text-red-500">*</span>
                 </label>

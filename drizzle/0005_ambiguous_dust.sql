@@ -1,0 +1,1 @@
+ALTER TABLE `talents` ADD `socialName` varchar(255);

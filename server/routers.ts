@@ -41,6 +41,7 @@ export const appRouter = router({
     createProfile: protectedProcedure
       .input(z.object({
         pseudonym: z.string().min(3),
+        socialName: z.string().optional(),
         bio: z.string().optional(),
         currentRole: z.string().optional(),
         yearsExperience: z.string().optional(),

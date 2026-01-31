@@ -843,6 +843,7 @@ export async function listTalents(filters: {
       id: talents.id,
       userId: talents.userId,
       pseudonym: talents.pseudonym,
+      socialName: talents.socialName,
       bio: talents.bio,
       currentRole: talents.currentRole,
       yearsExperience: talents.yearsExperience,

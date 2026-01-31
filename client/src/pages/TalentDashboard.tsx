@@ -103,7 +103,7 @@ export default function TalentDashboard() {
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-magenta-500 flex items-center justify-center">
               <User className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-white font-space-mono text-lg mb-1">{profile.pseudonym}</h3>
+            <h3 className="text-white font-space-mono text-lg mb-1">{profile.socialName || profile.pseudonym}</h3>
             <p className="text-cyan-400 text-sm">{profile.currentRole || "Candidata"}</p>
             {profile.identityVerified && (
               <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/50">
