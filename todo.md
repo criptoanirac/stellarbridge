@@ -286,3 +286,11 @@
 - [x] Adicionar botão Voltar no topo da página MyEarnings
 - [x] Redirecionar para /talent-dashboard ao clicar
 - [x] Testar navegação
+
+## Manual de Marca StellarBridge
+- [x] Criar logo principal (horizontal e vertical)
+- [x] Criar variações da logo (monocromática, invertida)
+- [x] Definir paleta de cores oficial
+- [x] Definir tipografia oficial
+- [x] Criar manual de marca em PDF
+- [x] Gerar exemplos de aplicação

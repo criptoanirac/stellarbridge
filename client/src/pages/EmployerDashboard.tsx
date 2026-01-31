@@ -58,7 +58,7 @@ export default function EmployerDashboard() {
     },
     {
       id: 2,
-      title: "2 candidatos com experiência em Product Management disponíveis",
+      title: "2 candidatas com experiência em Product Management disponíveis",
       matchPercentage: 88,
       skills: ["Product Strategy", "Analytics", "Leadership"],
     },
