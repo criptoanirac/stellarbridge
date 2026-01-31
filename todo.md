@@ -251,3 +251,8 @@
 - [x] Se perfil existe → dashboard
 - [x] Se perfil não existe → tela de escolha (criar perfil)
 - [ ] Testar fluxo completo de autenticação
+
+## Navegação - Link Meus Ganhos no Dashboard
+- [x] Adicionar item "Meus Ganhos" no sidebar do TalentDashboard
+- [x] Adicionar ícone apropriado (Wallet)
+- [x] Testar navegação entre dashboard e página de ganhos

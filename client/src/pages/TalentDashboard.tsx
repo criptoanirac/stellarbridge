@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Star, Briefcase, Heart, Settings, LogOut, User, Award, BookOpen } from "lucide-react";
+import { ArrowLeft, Star, Briefcase, Heart, Settings, LogOut, User, Award, BookOpen, Wallet } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -140,6 +140,14 @@ export default function TalentDashboard() {
               <span className="ml-auto px-2 py-1 rounded-full bg-magenta-500/20 text-magenta-400 text-xs">
                 0
               </span>
+            </button>
+
+            <button
+              onClick={() => setLocation("/my-earnings")}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5"
+            >
+              <Wallet className="w-5 h-5" />
+              <span>Meus Ganhos</span>
             </button>
 
             <button
