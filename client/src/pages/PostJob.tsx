@@ -1,9 +1,10 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, X, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 /**
  * Post Job Page - Interactive Job Posting Form
@@ -12,6 +13,17 @@ import { toast } from "sonner";
  */
 export default function PostJob() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  
+  // Check if company profile exists
+  const { data: companyProfile, isLoading: isLoadingProfile } = trpc.company.getProfile.useQuery();
+  
+  useEffect(() => {
+    if (!isLoadingProfile && !companyProfile) {
+      toast.error("Você precisa criar um perfil de empresa primeiro!");
+      setLocation("/employer-dashboard");
+    }
+  }, [companyProfile, isLoadingProfile, setLocation]);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -98,6 +110,15 @@ export default function PostJob() {
   };
 
   const createJob = trpc.job.create.useMutation();
+  
+  // Show loading while checking profile
+  if (isLoadingProfile) {
+    return (
+      <div className="min-h-screen grid-bg flex items-center justify-center">
+        <div className="text-cyan-400 text-xl">Carregando...</div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -270,3 +270,14 @@
 - [x] Remover botão "Já tenho cadastro" (desnecessário com OAuth)
 - [x] Garantir que dados existentes sejam exibidos corretamente
 - [x] Testar fluxo completo de login → carregamento automático
+
+## Bug - Erro ao Publicar Vaga sem Perfil de Empresa
+- [x] Investigar erro "Company profile not found" na página /post-job
+- [x] Adicionar validação para verificar se empresa tem perfil antes de publicar vaga
+- [x] Redirecionar para criação de perfil de empresa se não existir
+- [ ] Testar fluxo completo de publicação de vaga
+
+## Bug - Textos com Baixa Visibilidade
+- [x] Corrigir opacity inválida no botão Editar Perfil
+- [ ] Investigar outros textos com problemas de contraste/visibilidade
+- [ ] Ajustar cores e opacidades para melhor legibilidade
