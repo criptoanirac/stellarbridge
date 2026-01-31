@@ -263,4 +263,10 @@
 - [x] Atualizar TalentDashboard para exibir Nome Social
 - [x] Atualizar Bridge para exibir Nome Social das candidatas
 - [x] Atualizar todos os lugares onde nome é exibido
-- [ ] Testar cadastro e visualização completos
+- [x] Testar cadastro e visualização completos
+
+## Melhoria - Carregamento Automático de Perfil Existente
+- [x] Melhorar TalentDashboard para carregar perfil automaticamente via user.id
+- [x] Remover botão "Já tenho cadastro" (desnecessário com OAuth)
+- [x] Garantir que dados existentes sejam exibidos corretamente
+- [x] Testar fluxo completo de login → carregamento automático

@@ -40,36 +40,22 @@ export default function TalentDashboard() {
       <div className="min-h-screen grid-bg flex items-center justify-center">
         <div className="max-w-md w-full mx-auto p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">Bem-vinda à StellarBridge!</h2>
-            <p className="text-slate-400">Escolha uma opção para continuar</p>
+            <h2 className="text-3xl font-bold text-white mb-2">Bem-vinda à StellarBridge! 💜</h2>
+            <p className="text-slate-400">Você está autenticada, mas ainda não possui um perfil cadastrado.</p>
           </div>
           
-          <div className="space-y-4">
-            <div className="p-6 bg-slate-900/50 border border-cyan-500/20 rounded-lg">
-              <h3 className="text-xl font-bold text-white mb-2">Já tenho cadastro</h3>
-              <p className="text-slate-400 text-sm mb-4">Acesse seu perfil existente</p>
-              <Button 
-                onClick={() => {
-                  toast.info("Você já está logada! Mas seu perfil ainda não foi criado.");
-                  setLocation("/talent-signup");
-                }} 
-                variant="outline"
-                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
-              >
-                Acessar Perfil
-              </Button>
+          <div className="p-8 bg-slate-900/50 border border-magenta-500/20 rounded-lg text-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-magenta-500 flex items-center justify-center">
+              <User className="w-10 h-10 text-white" />
             </div>
-            
-            <div className="p-6 bg-slate-900/50 border border-magenta-500/20 rounded-lg">
-              <h3 className="text-xl font-bold text-white mb-2">Novo por aqui?</h3>
-              <p className="text-slate-400 text-sm mb-4">Crie seu perfil e comece a receber oportunidades</p>
-              <Button 
-                onClick={() => setLocation("/talent-signup")} 
-                className="w-full bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600"
-              >
-                Criar Perfil
-              </Button>
-            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Crie seu Perfil</h3>
+            <p className="text-slate-400 text-sm mb-6">Complete seu cadastro e comece a receber oportunidades de emprego na área de tecnologia</p>
+            <Button 
+              onClick={() => setLocation("/talent-signup")} 
+              className="w-full bg-gradient-to-r from-cyan-500 to-magenta-500 hover:from-cyan-600 hover:to-magenta-600"
+            >
+              Começar Cadastro
+            </Button>
           </div>
           
           <div className="mt-6 text-center">
