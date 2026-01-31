@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Wallet, TrendingUp, Award, Clock, CheckCircle2, Lock } from "lucide-react";
+import { Wallet, TrendingUp, Award, Clock, CheckCircle2, Lock, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 /**
@@ -126,11 +127,21 @@ export default function MyEarnings() {
     }
   };
 
+  const [, setLocation] = useLocation();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-6">
       <div className="container max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
+          <Button
+            onClick={() => setLocation("/talent-dashboard")}
+            variant="ghost"
+            className="mb-4 text-slate-400 hover:text-white"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Voltar
+          </Button>
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-magenta-400 bg-clip-text text-transparent">
             Meus Ganhos
           </h1>

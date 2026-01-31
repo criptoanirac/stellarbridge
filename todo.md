@@ -275,9 +275,14 @@
 - [x] Investigar erro "Company profile not found" na página /post-job
 - [x] Adicionar validação para verificar se empresa tem perfil antes de publicar vaga
 - [x] Redirecionar para criação de perfil de empresa se não existir
-- [ ] Testar fluxo completo de publicação de vaga
+- [x] Testar fluxo completo de publicação de vaga
 
 ## Bug - Textos com Baixa Visibilidade
 - [x] Corrigir opacity inválida no botão Editar Perfil
 - [ ] Investigar outros textos com problemas de contraste/visibilidade
 - [ ] Ajustar cores e opacidades para melhor legibilidade
+
+## Navegação - Botão Voltar em Meus Ganhos
+- [x] Adicionar botão Voltar no topo da página MyEarnings
+- [x] Redirecionar para /talent-dashboard ao clicar
+- [x] Testar navegação
