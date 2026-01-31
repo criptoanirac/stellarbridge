@@ -2,7 +2,7 @@
 
 **Sua ponte para a liberdade profissional**
 
-StellarBridge é uma plataforma inovadora de recrutamento blind (às cegas) com validação blockchain, projetada para conectar talentos femininos verificados a empresas comprometidas com diversidade e inclusão. A plataforma elimina vieses inconscientes no processo de recrutamento através de perfis pseudonimizados, validação de habilidades em blockchain e matchmaking inteligente baseado em competências técnicas.
+StellarBridge é uma plataforma inovadora de recrutamento blind (às cegas) com validação blockchain, projetada para conectar talentos especificamente Mulheres Trans verificados a empresas comprometidas com diversidade e inclusão. A plataforma elimina vieses inconscientes no processo de recrutamento através de perfis pseudonimizados, validação de habilidades em blockchain e matchmaking inteligente baseado em competências técnicas.
 
 ---
 
@@ -371,6 +371,13 @@ Para dúvidas, sugestões ou parcerias, entre em contato através do GitHub ou a
 ---
 
 ## 🔮 Roadmap Futuro
+**Incusão de Novos grupos minorizados: Mulheres Pretas
+
+** Suporte para acesso a serviços jurídicos
+
+**Mentoria de Carreira:**Teste vocacional com auxilio profissional
+
+**Suporte piscológico:** A plataforma conectará com profissionais voluntários especializados em saúde mental 
 
 **Sistema de Favoritos:** Permitir que empresas salvem candidatas de interesse para revisão posterior com lista dedicada no dashboard empresarial.
 
